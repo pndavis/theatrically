@@ -12,13 +12,14 @@ Premium formats
 Subscription service
 Serves Alcohol -->
 
+---
 
 Movie Subscriptions:
 If you go to the movies as frequently as I do, you definitely need to look into a theater subscription service. The two main ones you need to chose between are the AMC Stubs A-List and Regal Unlimited.
 * AMC Stubs A-List: This is the program I use and as such this list is going to be biased towards AMC theaters. With your A-List subscription, you get to watch 3 movies a week at any AMC and week resets Friday morning. What really stands out is there are no extra charges for premium formats like IMAX or Dolby Cinema. You only have to see two movies a month to justify the monthly charge. 
 * Regal Unlimited: Regal Unlimited comes much closer to capturing the magic of Moviepass. You can basically see unlimited movies but you can’t see the same movie in the same format more than once per day. The downside is all the fees. You get charged fees for booking online and fees for premium showings like IMAX, 4DX, 3D, and ScreenX. I personally prefer AMC for the lack of fees for online orders and premium formats and because I rarely see more than 3 movies a week. 
 
-
+---
 
 
 
