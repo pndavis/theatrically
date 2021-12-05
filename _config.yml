@@ -3,10 +3,10 @@
 #
 
 # Name of your site (displayed in the header)
-name: Reverie
+name: PaulDavis.io
 
 # Name of the author
-author: Amit Merchant
+author: Paul Davis
 
 # Short bio or description (displayed in the header)
 description: An elegant Jekyll theme
@@ -24,11 +24,11 @@ footer-links:
   email: 
   facebook:
   flickr:
-  github: 
+  github: https://github.com/pndavis
   instagram:
   linkedin: 
   pinterest:
-  rss: rss
+#  rss: rss
   twitter: 
   stackoverflow: 
   youtube: # channel/<your_long_string> or user/<user-name>
