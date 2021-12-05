@@ -58,4 +58,4 @@ for theater, details in seattle_theaters.items():
 
 
 # Save the map
-MyMap.save('MyMap.html')
+MyMap.save('theater-map.html')
