@@ -6,7 +6,7 @@ permalink: /seattle-movies/
 
 Seattle is a pretty good place to go to the movies. There are huge theaters for the latest blockbuster hits as well vibrant small theaters for an obscure indie release. I've spent a lot of time checking out the different theaters in the area, so here are my thoughts on getting the best movie watching experience. 
 
-<iframe src="theater-map.html" height="500" width="500"></iframe>
+<iframe src="../theater-map.html" height="500" width="700"></iframe>
 
 <!-- Rate on different scales: 
 Location and accessibility
