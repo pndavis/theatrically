@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from folium.plugins import LocateControl, MarkerCluster
 
 # Create the map
-MyMap = folium.Map(location=[47.6078, -122.3424], tiles='OpenStreetMap', zoom_start=11, max_zoom=13, control_scale=True)
+theater_map = folium.Map(location=[47.6078, -122.3424], tiles='OpenStreetMap', zoom_start=11, max_zoom=15, min_zoom=10, control_scale=True)
 
 				#'Theater Name': [(lat, lon), 'theater type', 'website_URL', 'google_maps_directions_URL'],
 seattle_theaters = {'AMC Seattle 10': [(47.66175,-122.31811), 'amc', 'https://www.amctheatres.com/movie-theatres/seattle-tacoma/amc-seattle-10', 'google_maps_directions_URL', '10'],
@@ -41,7 +41,7 @@ for theater, details in seattle_theaters.items():
     popup = folium.Popup(theater_html, max_width=700)
     # Create marker with custom icon and pop-up.
     custom_marker = folium.Marker(location=coordinates, icon=custom_icon, tooltip=name, popup=popup)
-    custom_marker.add_to(MyMap)
+    custom_marker.add_to(theater_map)
 # AMC Pacific Place 11
 # AMC Alderwood 16
 # AMC Woodinville 12
@@ -53,7 +53,7 @@ for theater, details in seattle_theaters.items():
 # Boeing IMAX at Pacific Science Center
 
 # Add geolocation feature to map.
-LocateControl(auto_start=False).add_to(MyMap)
+LocateControl(auto_start=False).add_to(theater_map)
 
 # Save the map
-MyMap.save('theater-map.html')
+theater_map.save('theater-map.html')
