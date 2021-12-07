@@ -15,3 +15,5 @@ config.py
 __pycache__/
 test.json
 cmon.json
+short.json
+movietimes.sqlite
