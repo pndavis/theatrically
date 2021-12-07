@@ -11,3 +11,7 @@ package.json
 *.gemspec
 .jekyll-cache
 tutorials/
+config.py
+__pycache__/
+test.json
+cmon.json
