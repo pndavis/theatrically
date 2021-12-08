@@ -4,6 +4,32 @@ from datetime import datetime
 import config
 import pandas as pd
 import sqlite3
+from imdb import IMDb
+
+ia = IMDb()
+
+# get a movie and print its director(s)
+
+found = ia.search_movie('cmon cmon')
+print(found[0].movieID)
+movies = ia.get_movie(found[0].movieID)
+# print(movies.infoset2keys)
+# the_matrix = ia.get_movie('0133093')
+# for director in the_matrix['directors']:
+#     print(director['name'])
+
+# show all information that are currently available for a movie
+# print(sorted(the_matrix.keys()))
+
+# show all information sets that can be fetched for a movie
+# print(ia.get_movie_infoset())
+
+# update a Movie object with more information
+# ia.update(the_matrix, ['technical'])
+# show which keys were added by the information set
+# print(the_matrix.infoset2keys['technical'])
+# print one of the new keys
+print(movies.get('full-size cover url'))
 
 
 con = sqlite3.connect('movietimes.sqlite')
@@ -97,8 +123,13 @@ while x < len(jsonData):
 con.commit()
 df = pd.read_sql_query("SELECT theatreName, title, movieTime FROM movieTimeDB WHERE title = 'Benedetta'", con)
 
-# Verify that result of SQL query is stored in the dataframe
-print(df)
+# print(df)
+
+df = pd.read_sql_query("SELECT theatreName, title, movieTime FROM movieTimeDB WHERE theatreName = 'AMC Dine-In Seattle 10'", con)
+
+# print(df)
+
+
 
 # Save (commit) the changes
 con.commit()
