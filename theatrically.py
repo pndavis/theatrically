@@ -14,6 +14,7 @@ def my_form():
 
 @app.route('/moviesShowing', methods=['POST'])
 def my_form_post():
+    createPosterDatabase()
     start = '&startDate=' + request.form['start']
     numDays = '&numDays' + request.form['numDays']
     zipcode = '&zip=' + request.form['zip']
@@ -26,7 +27,6 @@ def my_form_post():
         moviesShowing="Ran out of api calls"
     else:
         moviesShowing = (dumpToDatabase(jsonData))
-        # moviesShowingSorted = sorted((moviesShowing), key=str.casefold)
         
     return render_template("moviesShowing.html",moviesShowing=moviesShowing)
 

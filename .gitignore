@@ -19,3 +19,5 @@ short.json
 movietimes.sqlite
 90days.json
 nyc90.json
+moviePosters.sqlite
+movietimes.sqlite-journal

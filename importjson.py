@@ -6,13 +6,13 @@ import pandas as pd
 import sqlite3
 from imdb import IMDb
 
-ia = IMDb()
+IMDbAPI = IMDb()
 
 # get a movie and print its director(s)
 
-found = ia.search_movie('cmon cmon')
+
 # print(found[0].movieID)
-# movies = ia.get_movie(found[0].movieID)
+
 # print(movies.infoset2keys)
 # the_matrix = ia.get_movie('0133093')
 # for director in the_matrix['directors']:
@@ -29,7 +29,10 @@ found = ia.search_movie('cmon cmon')
 # show which keys were added by the information set
 # print(the_matrix.infoset2keys['technical'])
 # print one of the new keys
-# print(movies.get('full-size cover url'))
+
+lookUpMovie = IMDbAPI.search_movie('cmon cmon')
+currentMovie = IMDbAPI.get_movie(lookUpMovie[0].movieID)
+currentMovie.get('full-size cover url')
 
 def createDatabase():
 	con = sqlite3.connect('movietimes.sqlite')
@@ -41,11 +44,55 @@ def createDatabase():
 		pass
 	# Create table
 	cur.execute('''CREATE TABLE movieTimeDB
-	               (title text, theatreName text, theatreID text, movieTime date, generalSettings text)''')
+	               (title text, theatreName text, theatreID text, movieTime date, generalSettings text, posterURL text)''')
 
 	return con, cur
 
+def createPosterDatabase():
+	con = sqlite3.connect('movietimes.sqlite')
+	cursor = con.cursor()
 
+	try:
+		cursor.execute('DROP TABLE moviePosterDB')
+	except:
+		pass
+
+	try:
+		cursor.execute('''CREATE TABLE moviePosterDB
+	               (title text, posterURL text)''')
+	except:
+		pass
+	
+
+
+	jsonData = pullFromJson()
+	x = 0
+	while x < len(jsonData):
+
+		fullMovieName = jsonData[x]['title']
+		movieName = (jsonData[x]['title']).replace(': The IMAX 2D Experience', '')
+
+		print(fullMovieName + " looking for: " + movieName)
+		lookUpMovie = IMDbAPI.search_movie(movieName)
+		
+		
+		try:
+			print("Found movie " + lookUpMovie[0].movieID)
+			currentMovie = IMDbAPI.get_movie(lookUpMovie[0].movieID)
+			posterURL = currentMovie.get('full-size cover url')
+		except:
+			posterURL = ""
+			print("Movie not found")
+		print(posterURL)
+		# posterURL = "https://m.media-amazon.com/images/M/MV5BMzkwZWJhOTUtZTJkMC00OWQ5LTljZDctYzgxNWFiYjEyZjZiXkEyXkFqcGdeQXVyMDA4NzMyOA@@.jpg"
+
+		cursor.execute("INSERT INTO moviePosterDB VALUES (?, ?)", (fullMovieName, posterURL))
+		x+=1
+
+	con.commit()
+	con.close()
+
+	print("Database created")
 
 
 def pullFromJson():
@@ -82,53 +129,47 @@ def getGracenoteAPI(startDate1, numDays1, zipcode1, radius1):
 
 def dumpToDatabase(jsonData):
 	con, cursor = createDatabase()
+
 	x = 0
-	allMovies = []
+	# allMovies = []
 	while x < len(jsonData):
-		allMovies.append(jsonData[x]['title'])
+		# allMovies.append(jsonData[x]['title'])
 		count = 0
 		currenttheatre = ""
-		lasttheatre = ""
-		posterURL =''
+		currenttitle = jsonData[x]['title']
+
+		# lookUpMovie = IMDbAPI.search_movie(jsonData[x]['title'])
+		# currentMovie = IMDbAPI.get_movie(lookUpMovie[0].movieID)
+		# posterURL = currentMovie.get('full-size cover url')
+		# print(posterURL)
+		
+		cursor.execute("SELECT posterURL FROM moviePosterDB WHERE title=?", (currenttitle,))
+		posterURL = cursor.fetchall()
+		print(posterURL[0][0]) 
+
 		while count < len(jsonData[x]['showtimes']):
 			currenttheatre = jsonData[x]['showtimes'][count]['theatre']['name']
-			premium = ""
 
-			currenttitle = jsonData[x]['title']
+			
 			theatreID = jsonData[x]['showtimes'][count]['theatre']['id']
 			currentTime = jsonData[x]['showtimes'][count]['dateTime']
 
 			try:
 				details = jsonData[x]['showtimes'][count]['quals']
-				if "Dolby Cinema" in details:
-					premium = "Dolby Cinema"
-				if "IMAX" in details:
-					premium = "IMAX"
 			except:
 				details = ""
 
 
-			# (title text, theatreName text, theatreID text, movieTime text, generalSettings text)
-
-			cursor.execute("INSERT INTO movieTimeDB VALUES (?, ?, ?, ?, ?)", (currenttitle, currenttheatre, theatreID, currentTime, details))	
-
-			# if currenttheatre == lasttheatre:
-			# 	print (datetime.strptime(jsonData[x]['showtimes'][count]['dateTime'], "%Y-%m-%dT%H:%M").strftime('%I:%M%p').lower() + " " + premium)
-			# else:
-			# 	print()
-			# 	print (currenttheatre)
-			# 	print (datetime.strptime(jsonData[x]['showtimes'][count]['dateTime'], "%Y-%m-%dT%H:%M").strftime('%I:%M%p').lower() + " " + premium)
-
-			# lasttheatre = currenttheatre
+			cursor.execute("INSERT INTO movieTimeDB VALUES (?, ?, ?, ?, ?, ?)", (currenttitle, currenttheatre, theatreID, currentTime, details, posterURL[0][0]))	
 
 			count+=1
 		x+=1
 	con.commit()
 
-	query = "SELECT DISTINCT title FROM movieTimeDB"
+	query = "SELECT DISTINCT title, posterURL FROM movieTimeDB ORDER BY title COLLATE NOCASE ASC"
 	cursor.execute(query)
 	allMovieTitles = cursor.fetchall()
-	print(allMovieTitles)
+	# print(allMovieTitles)
 
 
 	con.close()
@@ -137,8 +178,6 @@ def dumpToDatabase(jsonData):
 	return allMovieTitles
 
 def searchDatabase(findmovie, alist, dolby, imax):
-	# print("What movie do you want to see showtimes for?")
-	# input1 = str(input())
 	con = sqlite3.connect('movietimes.sqlite')
 	cursor = con.cursor()
 
@@ -177,7 +216,7 @@ def searchDatabase(findmovie, alist, dolby, imax):
 	# cursor.execute("SELECT title, theatreName, STRFTIME('%m/%d at %H:%M', movieTime), generalSettings FROM movieTimeDB WHERE generalSettings LIKE %(?)% AND title = (?)", (premium, findmovie))
 	# cursor.execute("SELECT title, theatreName, movieTime, generalSettings FROM movieTimeDB WHERE title = '%s'" % (findmovie))
 	data = cursor.fetchall()
-	print(data)
+	# print(data)
 	# df = pd.read_sql_query("SELECT title, theatreName, movieTime, generalSettings FROM movieTimeDB WHERE title = '%s'" % (findmovie), con)
 	# print(pd.read_sql_query("SELECT title, theatreName, movieTime, generalSettings FROM movieTimeDB WHERE title = 'Dune'", con))
 	# df = pd.read_sql_query("SELECT title, theatreName, movieTime FROM movieTimeDB WHERE generalSettings LIKE '%70mm%'", con)
