@@ -14,14 +14,14 @@ def my_form():
 
 @app.route('/moviesShowing', methods=['POST'])
 def my_form_post():
-    createPosterDatabase()
+    # createPosterDatabase()
     start = '&startDate=' + request.form['start']
-    numDays = '&numDays' + request.form['numDays']
+    numDays = '&numDays=' + request.form['numDays']
     zipcode = '&zip=' + request.form['zip']
-    daterange = '&radius' + request.form['range']
+    daterange = '&radius=' + request.form['range']
 
-    # jsonData = getGracenoteAPI(start, numDays, zipcode, daterange)
-    jsonData = pullFromJson()
+    jsonData = getGracenoteAPI(start, numDays, zipcode, daterange)
+    # jsonData = pullFromJson()
 
     if(jsonData == None):
         moviesShowing="Ran out of api calls"

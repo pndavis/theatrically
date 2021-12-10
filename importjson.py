@@ -71,6 +71,7 @@ def createPosterDatabase():
 
 		fullMovieName = jsonData[x]['title']
 		movieName = (jsonData[x]['title']).replace(': The IMAX 2D Experience', '')
+		movieName.replace(' -- The IMAX 2D Experience', '')
 
 		print(fullMovieName + " looking for: " + movieName)
 		lookUpMovie = IMDbAPI.search_movie(movieName)
@@ -115,6 +116,7 @@ def getGracenoteAPI(startDate1, numDays1, zipcode1, radius1):
 	api = config.api_key
 
 	gracenote = 'http://data.tmsapi.com/v1.1/movies/showings?' + startDate1 + numDays1 + zipcode1 + radius1 + api
+	print(gracenote)
 	response = requests.get(gracenote)
 
 	try:
@@ -131,6 +133,7 @@ def dumpToDatabase(jsonData):
 	con, cursor = createDatabase()
 
 	x = 0
+	firstLastTime = []
 	# allMovies = []
 	while x < len(jsonData):
 		# allMovies.append(jsonData[x]['title'])
@@ -138,14 +141,14 @@ def dumpToDatabase(jsonData):
 		currenttheatre = ""
 		currenttitle = jsonData[x]['title']
 
-		# lookUpMovie = IMDbAPI.search_movie(jsonData[x]['title'])
-		# currentMovie = IMDbAPI.get_movie(lookUpMovie[0].movieID)
-		# posterURL = currentMovie.get('full-size cover url')
-		# print(posterURL)
-		
 		cursor.execute("SELECT posterURL FROM moviePosterDB WHERE title=?", (currenttitle,))
 		posterURL = cursor.fetchall()
-		print(posterURL[0][0]) 
+		try:
+			print(posterURL)
+			posterURL = posterURL[0][0]
+			print(posterURL) 
+		except:
+			posterURL = ''
 
 		while count < len(jsonData[x]['showtimes']):
 			currenttheatre = jsonData[x]['showtimes'][count]['theatre']['name']
@@ -160,22 +163,35 @@ def dumpToDatabase(jsonData):
 				details = ""
 
 
-			cursor.execute("INSERT INTO movieTimeDB VALUES (?, ?, ?, ?, ?, ?)", (currenttitle, currenttheatre, theatreID, currentTime, details, posterURL[0][0]))	
+			cursor.execute("INSERT INTO movieTimeDB VALUES (?, ?, ?, ?, ?, ?)", (currenttitle, currenttheatre, theatreID, currentTime, details, posterURL))	
 
 			count+=1
+		cursor.execute("SELECT title, MIN(movieTime) AS First, MAX(movieTime) AS Last, posterURL FROM movieTimeDB WHERE title = ?", (currenttitle,))
+		firstLastTime.append(cursor.fetchall())
 		x+=1
 	con.commit()
 
-	query = "SELECT DISTINCT title, posterURL FROM movieTimeDB ORDER BY title COLLATE NOCASE ASC"
-	cursor.execute(query)
-	allMovieTitles = cursor.fetchall()
+
+
+	# query = "SELECT DISTINCT title, posterURL FROM movieTimeDB ORDER BY title COLLATE NOCASE ASC"
+	# cursor.execute(query)
+	# allMovieTitles = cursor.fetchall()
 	# print(allMovieTitles)
 
 
 	con.close()
-	# print (allMovies)
-	# print(type(allMovies)) 
-	return allMovieTitles
+	# print (firstLastTime)
+	# print(type(firstLastTime)) 
+	
+
+	# test = [a + [b[1]] for (a, b) in zip(allMovieTitles, firstLastTime)]
+
+	# firstLastTime = firstLastTime[0]
+	print(firstLastTime)
+	tosendback = sorted(firstLastTime, key=lambda x: x[0][0].lower())
+	print(tosendback)
+	return tosendback
+
 
 def searchDatabase(findmovie, alist, dolby, imax):
 	con = sqlite3.connect('movietimes.sqlite')
