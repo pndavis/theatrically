@@ -135,7 +135,7 @@ def dumpToDatabase(jsonData):
 	con, cursor = createDatabase()
 
 	x = 0
-	firstLastTime = []
+	moviesPlayingNearYou = []
 	# allMovies = []
 	while x < len(jsonData):
 		# allMovies.append(jsonData[x]['title'])
@@ -167,28 +167,15 @@ def dumpToDatabase(jsonData):
 
 			count+=1
 		cursor.execute("SELECT title, MIN(movieTime) AS First, MAX(movieTime) AS Last, posterURL FROM movieTimeDB WHERE title = ?", (currenttitle,))
-		firstLastTime.append(cursor.fetchall())
+		moviesPlayingNearYou.append(cursor.fetchall())
 		x+=1
 	con.commit()
-
-	# print(allMovies)
-
-	# query = "SELECT DISTINCT title, posterURL FROM movieTimeDB ORDER BY title COLLATE NOCASE ASC"
-	# cursor.execute(query)
-	# allMovieTitles = cursor.fetchall()
-	# print(allMovieTitles)
-
-
 	con.close()
-	# print (firstLastTime)
-	# print(type(firstLastTime)) 
 	
 
-	# test = [a + [b[1]] for (a, b) in zip(allMovieTitles, firstLastTime)]
-
-	# firstLastTime = firstLastTime[0]
-	# print(firstLastTime)
-	tosendback = sorted(firstLastTime, key=lambda x: x[0][0].lower())
+	# moviesPlayingNearYou = moviesPlayingNearYou[0]
+	# print(moviesPlayingNearYou)
+	tosendback = sorted(moviesPlayingNearYou, key=lambda x: x[0][0].lower())
 	# print(tosendback)
 	return tosendback
 
