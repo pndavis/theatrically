@@ -2,6 +2,10 @@ from flask import Flask, request, render_template
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
 
+
+# <!-- <td>{{macros.datetime.strptime(row[0][1], "%Y-%m-%dT%H:%M").strftime("%b %d at %I:%M%p")}}</td> -->
+
+
 from importjson import *
 
 
@@ -15,19 +19,26 @@ def my_form():
 @app.route('/moviesShowing', methods=['POST'])
 def my_form_post():
     # createPosterDatabase()
-    start = '&startDate=' + request.form['start']
-    numDays = '&numDays=' + request.form['numDays']
-    zipcode = '&zip=' + request.form['zip']
-    daterange = '&radius=' + request.form['range']
 
-    jsonData = getGracenoteAPI(start, numDays, zipcode, daterange)
-    # jsonData = pullFromJson()
+    start = request.form['startDate']
+    numDays = request.form['numDays']
+    zipcode = request.form['zipcode']
+    zipcode = request.form['lat']
+    zipcode = request.form['lng']
+    daterange = request.form['radius']
+    zipcode = request.form['units']
+
+    # jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
+    jsonData = pullFromJson()
 
     if(jsonData == None):
         moviesShowing="Ran out of api calls"
     else:
         moviesShowing = (dumpToDatabase(jsonData))
-        
+    
+    print(moviesShowing[0])
+    print(type(moviesShowing[0]))
+
     return render_template("moviesShowing.html",moviesShowing=moviesShowing)
 
 @app.route('/showtimes', methods=['POST'])

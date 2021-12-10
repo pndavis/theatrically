@@ -8,31 +8,6 @@ from imdb import IMDb
 
 IMDbAPI = IMDb()
 
-# get a movie and print its director(s)
-
-
-# print(found[0].movieID)
-
-# print(movies.infoset2keys)
-# the_matrix = ia.get_movie('0133093')
-# for director in the_matrix['directors']:
-#     print(director['name'])
-
-# show all information that are currently available for a movie
-# print(sorted(the_matrix.keys()))
-
-# show all information sets that can be fetched for a movie
-# print(ia.get_movie_infoset())
-
-# update a Movie object with more information
-# ia.update(the_matrix, ['technical'])
-# show which keys were added by the information set
-# print(the_matrix.infoset2keys['technical'])
-# print one of the new keys
-
-lookUpMovie = IMDbAPI.search_movie('cmon cmon')
-currentMovie = IMDbAPI.get_movie(lookUpMovie[0].movieID)
-currentMovie.get('full-size cover url')
 
 def createDatabase():
 	con = sqlite3.connect('movietimes.sqlite')
@@ -62,8 +37,6 @@ def createPosterDatabase():
 	               (title text, posterURL text)''')
 	except:
 		pass
-	
-
 
 	jsonData = pullFromJson()
 	x = 0
@@ -76,13 +49,12 @@ def createPosterDatabase():
 		print(fullMovieName + " looking for: " + movieName)
 		lookUpMovie = IMDbAPI.search_movie(movieName)
 		
-		
 		try:
 			print("Found movie " + lookUpMovie[0].movieID)
 			currentMovie = IMDbAPI.get_movie(lookUpMovie[0].movieID)
 			posterURL = currentMovie.get('full-size cover url')
 		except:
-			posterURL = ""
+			posterURL = "Movie_not_found"
 			print("Movie not found")
 		print(posterURL)
 		# posterURL = "https://m.media-amazon.com/images/M/MV5BMzkwZWJhOTUtZTJkMC00OWQ5LTljZDctYzgxNWFiYjEyZjZiXkEyXkFqcGdeQXVyMDA4NzMyOA@@.jpg"
@@ -95,6 +67,36 @@ def createPosterDatabase():
 
 	print("Database created")
 
+# def updatePosterDatabase():
+	# con = sqlite3.connect('movietimes.sqlite')
+	# cursor = con.cursor()
+
+	# jsonData = pullFromJson()
+	# x = 0
+	# while x < len(jsonData):
+
+	# 	fullMovieName = jsonData[x]['title']
+	# 	movieName = (jsonData[x]['title']).replace(': The IMAX 2D Experience', '')
+	# 	movieName.replace(' -- The IMAX 2D Experience', '')
+
+	# 	print(fullMovieName + " looking for: " + movieName)
+	# 	lookUpMovie = IMDbAPI.search_movie(movieName)
+		
+	# 	try:
+	# 		print("Found movie " + lookUpMovie[0].movieID)
+	# 		currentMovie = IMDbAPI.get_movie(lookUpMovie[0].movieID)
+	# 		posterURL = currentMovie.get('full-size cover url')
+	# 	except:
+	# 		posterURL = "Movie_not_found"
+	# 		print("Movie not found")
+	# 	print(posterURL)
+
+	# 	cursor.execute("INSERT INTO moviePosterDB VALUES (?, ?)", (fullMovieName, posterURL))
+	# 	x+=1
+	# con.commit()
+	# con.close()
+	# print("Poster Database updated")
+
 
 def pullFromJson():
 	f = open('90days.json')
@@ -102,7 +104,7 @@ def pullFromJson():
 
 	return jsonData
 
-def getGracenoteAPI(startDate1, numDays1, zipcode1, radius1):
+def getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units):
 	startDate = '&startDate=2021-12-09' #Start date (yyyy-mm-dd). Schedules available starting with current day.
 	numDays = '&numDays=90'
 	zipcode = '&zip=98102'
@@ -144,9 +146,7 @@ def dumpToDatabase(jsonData):
 		cursor.execute("SELECT posterURL FROM moviePosterDB WHERE title=?", (currenttitle,))
 		posterURL = cursor.fetchall()
 		try:
-			print(posterURL)
 			posterURL = posterURL[0][0]
-			print(posterURL) 
 		except:
 			posterURL = ''
 
@@ -171,7 +171,7 @@ def dumpToDatabase(jsonData):
 		x+=1
 	con.commit()
 
-
+	# print(allMovies)
 
 	# query = "SELECT DISTINCT title, posterURL FROM movieTimeDB ORDER BY title COLLATE NOCASE ASC"
 	# cursor.execute(query)
@@ -187,9 +187,9 @@ def dumpToDatabase(jsonData):
 	# test = [a + [b[1]] for (a, b) in zip(allMovieTitles, firstLastTime)]
 
 	# firstLastTime = firstLastTime[0]
-	print(firstLastTime)
+	# print(firstLastTime)
 	tosendback = sorted(firstLastTime, key=lambda x: x[0][0].lower())
-	print(tosendback)
+	# print(tosendback)
 	return tosendback
 
 
