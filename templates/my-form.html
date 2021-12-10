@@ -1,0 +1,16 @@
+<form method="POST" action="/moviesShowing">
+   <p>Find Movie Showings in your area:</p>
+    <label for="start">Start date:</label>
+    <input type="date" id="start" name="start"
+       value="2021-12-09"
+       min="2021-12-09" max="2021-12-31"><br>
+    <label for="numDays">Number of days to search (1-90):</label>
+    <input type="number" id="numDays" name="numDays" value="1" min="1" max="90"><br>
+    <label for="zip">Zip Code:</label>
+    <input type="number" id="zip" name="zip" value="98102" 
+       min="00000" max="99999"><br>
+    <label for="range">Range in Miles:</label>
+    <input type="number" id="range" name="range" value="5" 
+       min="1" max="30"><br>
+    <input type="submit">
+</form>
