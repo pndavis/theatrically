@@ -20,24 +20,21 @@ def my_form():
 def my_form_post():
     # createPosterDatabase()
 
-    start = request.form['startDate']
+    startDate = request.form['startDate']
     numDays = request.form['numDays']
     zipcode = request.form['zipcode']
-    zipcode = request.form['lat']
-    zipcode = request.form['lng']
-    daterange = request.form['radius']
-    zipcode = request.form['units']
+    lat = request.form['lat']
+    lng = request.form['lng']
+    radius = request.form['radius']
+    units = request.form['units']
 
-    # jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
-    jsonData = pullFromJson()
+    jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
+    # jsonData = pullFromJson()
 
     if(jsonData == None):
         moviesShowing="Ran out of api calls"
     else:
         moviesShowing = (dumpToDatabase(jsonData))
-    
-    print(moviesShowing[0])
-    print(type(moviesShowing[0]))
 
     return render_template("moviesShowing.html",moviesShowing=moviesShowing)
 
@@ -45,11 +42,13 @@ def my_form_post():
 def returnMovieTimes():
 
     movieName = request.form['movie']
+    theatreName = request.form['theater']
+    movieInfo = request.form['features']
     alist = request.form.get('alist')
     dolby = request.form.get('Dolby')
     imax = request.form.get('Imax')
 
-    times = searchDatabase(movieName, alist, dolby, imax)
+    times = searchDatabase(movieName, theatreName, movieInfo, alist, dolby, imax)
 
     return render_template("showtimes.html",showtimes=times)
     

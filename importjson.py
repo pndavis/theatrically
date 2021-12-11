@@ -105,19 +105,22 @@ def pullFromJson():
 	return jsonData
 
 def getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units):
-	startDate = '&startDate=2021-12-09' #Start date (yyyy-mm-dd). Schedules available starting with current day.
-	numDays = '&numDays=90'
-	zipcode = '&zip=98102'
+	startDate =  '&startDate=' + startDate #Start date (yyyy-mm-dd). Schedules available starting with current day.
+	if(numDays):
+		numDays = '&numDays=' + numDays
+	if(zipcode):
+		zipcode = '&zip=' + zipcode
 	lat = ''
 	lng = ''
-	radius = '&radius=5'
+	if(radius):
+		radius = '&radius=' + radius
 	units = ''
 	imageSize = ''
 	imageText = ''
 	market = ''
 	api = config.api_key
 
-	gracenote = 'http://data.tmsapi.com/v1.1/movies/showings?' + startDate1 + numDays1 + zipcode1 + radius1 + api
+	gracenote = 'http://data.tmsapi.com/v1.1/movies/showings?' + startDate + numDays + zipcode + radius + api
 	print(gracenote)
 	response = requests.get(gracenote)
 
@@ -180,7 +183,7 @@ def dumpToDatabase(jsonData):
 	return tosendback
 
 
-def searchDatabase(findmovie, alist, dolby, imax):
+def searchDatabase(findmovie, theatreName, movieInfo, alist, dolby, imax):
 	con = sqlite3.connect('movietimes.sqlite')
 	cursor = con.cursor()
 
@@ -202,11 +205,13 @@ def searchDatabase(findmovie, alist, dolby, imax):
 				WHERE title LIKE '%'||?||'%' 
 				AND theatreName LIKE '%'||?||'%' 
 				AND generalSettings LIKE '%'||?||'%' 
+				AND theatreName LIKE '%'||?||'%' 
+				AND generalSettings LIKE '%'||?||'%' 
 				AND (title LIKE '%'||?||'%' OR generalSettings LIKE '%'||?||'%') 
 				"""
 
 
-	searchParameters = (findmovie,alist,dolby,imax,imax)
+	searchParameters = (findmovie,theatreName,movieInfo,alist,dolby,imax,imax)
 	# print(type(searchParameters))
 	# print(searchParameters)
 	# print(query, searchParameters)
