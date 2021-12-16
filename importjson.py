@@ -19,11 +19,11 @@ def createDatabase():
 		pass
 	# Create table
 	cur.execute('''CREATE TABLE movieTimeDB
-	               (title text, theatreName text, theatreID text, movieTime date, generalSettings text, posterURL text)''')
+	               (title text, theatreName text, theatreID text, movieTime date, generalSettings text, officialUrl text, posterURL text)''')
 
 	return con, cur
 
-def createPosterDatabase():
+def createPosterDatabase(jsonData):
 	con = sqlite3.connect('movietimes.sqlite')
 	cursor = con.cursor()
 
@@ -38,13 +38,12 @@ def createPosterDatabase():
 	except:
 		pass
 
-	jsonData = pullFromJson()
 	x = 0
 	while x < len(jsonData):
 
 		fullMovieName = jsonData[x]['title']
 		movieName = (jsonData[x]['title']).replace(': The IMAX 2D Experience', '')
-		movieName.replace(' -- The IMAX 2D Experience', '')
+		movieName = movieName.replace(' -- The IMAX 2D Experience', '')
 
 		print(fullMovieName + " looking for: " + movieName)
 		lookUpMovie = IMDbAPI.search_movie(movieName)
@@ -67,35 +66,41 @@ def createPosterDatabase():
 
 	print("Database created")
 
-# def updatePosterDatabase():
-	# con = sqlite3.connect('movietimes.sqlite')
-	# cursor = con.cursor()
+def updatePosterDatabase(jsonData):
+	con = sqlite3.connect('movietimes.sqlite')
+	cursor = con.cursor()
 
-	# jsonData = pullFromJson()
-	# x = 0
-	# while x < len(jsonData):
+	jsonData = pullFromJson()
+	x = 0
+	while x < len(jsonData):
 
-	# 	fullMovieName = jsonData[x]['title']
-	# 	movieName = (jsonData[x]['title']).replace(': The IMAX 2D Experience', '')
-	# 	movieName.replace(' -- The IMAX 2D Experience', '')
+		fullMovieName = jsonData[x]['title']
+		movieName = (jsonData[x]['title']).replace(': The IMAX 2D Experience', '')
+		movieName.replace(' -- The IMAX 2D Experience', '')
 
-	# 	print(fullMovieName + " looking for: " + movieName)
-	# 	lookUpMovie = IMDbAPI.search_movie(movieName)
+
+		cursor.execute("SELECT title FROM moviePosterDB WHERE title=?", (fullMovieName,))
 		
-	# 	try:
-	# 		print("Found movie " + lookUpMovie[0].movieID)
-	# 		currentMovie = IMDbAPI.get_movie(lookUpMovie[0].movieID)
-	# 		posterURL = currentMovie.get('full-size cover url')
-	# 	except:
-	# 		posterURL = "Movie_not_found"
-	# 		print("Movie not found")
-	# 	print(posterURL)
+		found = cursor.fetchall()
 
-	# 	cursor.execute("INSERT INTO moviePosterDB VALUES (?, ?)", (fullMovieName, posterURL))
-	# 	x+=1
-	# con.commit()
-	# con.close()
-	# print("Poster Database updated")
+		if(found == []):
+			print(fullMovieName + " looking for: " + movieName)
+			lookUpMovie = IMDbAPI.search_movie(movieName)
+			
+			try:
+				print("Found movie " + lookUpMovie[0].movieID)
+				currentMovie = IMDbAPI.get_movie(lookUpMovie[0].movieID)
+				posterURL = currentMovie.get('full-size cover url')
+			except:
+				posterURL = "Movie_not_found"
+				print("Movie not found")
+			print(posterURL)
+
+			cursor.execute("INSERT INTO moviePosterDB VALUES (?, ?)", (fullMovieName, posterURL))
+		x+=1
+	con.commit()
+	con.close()
+	print("Poster Database updated")
 
 
 def pullFromJson():
@@ -145,6 +150,7 @@ def dumpToDatabase(jsonData):
 		count = 0
 		currenttheatre = ""
 		currenttitle = jsonData[x]['title']
+		officialUrl = ""
 
 		cursor.execute("SELECT posterURL FROM moviePosterDB WHERE title=?", (currenttitle,))
 		posterURL = cursor.fetchall()
@@ -152,6 +158,11 @@ def dumpToDatabase(jsonData):
 			posterURL = posterURL[0][0]
 		except:
 			posterURL = ''
+
+		try:
+			officialUrl = jsonData[x]['officialUrl']
+		except:
+			officialUrl = ""
 
 		while count < len(jsonData[x]['showtimes']):
 			currenttheatre = jsonData[x]['showtimes'][count]['theatre']['name']
@@ -166,11 +177,31 @@ def dumpToDatabase(jsonData):
 				details = ""
 
 
-			cursor.execute("INSERT INTO movieTimeDB VALUES (?, ?, ?, ?, ?, ?)", (currenttitle, currenttheatre, theatreID, currentTime, details, posterURL))	
+			cursor.execute("INSERT INTO movieTimeDB VALUES (?, ?, ?, ?, ?, ?, ?)", (currenttitle, currenttheatre, theatreID, currentTime, details, officialUrl, posterURL))	
 
 			count+=1
-		cursor.execute("SELECT title, MIN(movieTime) AS First, MAX(movieTime) AS Last, posterURL FROM movieTimeDB WHERE title = ?", (currenttitle,))
-		moviesPlayingNearYou.append(cursor.fetchall())
+		cursor.execute("SELECT title, MIN(movieTime) AS First, MAX(movieTime) AS Last, posterURL, officialUrl FROM movieTimeDB WHERE title = ?", (currenttitle,))
+		
+		DatabaseResults = cursor.fetchall()
+		
+
+
+		cursor.execute("SELECT DISTINCT theatreName FROM movieTimeDB WHERE title = ?", (currenttitle,))
+		whichTheaters = cursor.fetchall()
+
+
+		# print(''.join(map(str,DatabaseResults)))
+		DatabaseResults.append(whichTheaters)
+
+
+
+
+		# print(''.join(map(str,DatabaseResults)))
+		# print(''.join(map(str,DatabaseResults)) + ''.join(map(str,whichTheaters)))
+
+
+
+		moviesPlayingNearYou.append(DatabaseResults)
 		x+=1
 	con.commit()
 	con.close()

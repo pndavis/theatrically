@@ -13,10 +13,10 @@
 		}
 
 	</style>
-	<label for="movie">Search for showtimes for:</label>
+	<label for="movie">Search by movie:</label>
 	<input type="text" id="movie" name="movie" placeholder="Dune">
 	<label for="theater">Search by theater:</label>
-	<input type="text" id="theater" name="theater" placeholder="Siff">
+	<input type="text" id="theater" name="theater" placeholder="Siff">	
 	<label for="features">Search for showtime info:</label>
 	<input type="text" id="features" name="features" placeholder="eg Recliners or Subtitled">
 	<label for="Dolby">AMC Alist Only:</label>
@@ -29,39 +29,26 @@
 	<table>
 	    <thead>
 	    <tr>
-	        <th>Movies showing in your area:</th>
-	        <th>Local Showings Start:</th>
-	        <th>Local Showings End:</th>
-	        <th>Poster:</th>
-	        <th>Showing at:</th>
+	        <th>Movie</th>
+	        <th>Theater</th>
+	        <th>Time</th>
+	        <th>Details</th>
 	    </tr>
 	    </thead>
 	    <tbody>
 
-			{% for row in moviesShowing %}
+			{% for row in showtimes %}
 			    <tr>
-    				<td>{{row[0][0]}}</td> 
-
-		            <td>{{row[0][1]}}</td>
-		            <td>{{row[0][2]}}</td>
-		            {% if row[0][4] != "" %}
-        				<td><a href={{row[0][4]}}><img src={{row[0][3]}} width="50" height="100"></a></td> 
-    				{% else %}
-    					<td><img src={{row[0][3]}} width="50" height="100"></td>
-    				{% endif %}
-
-
-		            <td>{% for x in row[1] %}
-	            		<a>{{x[0]}}; </a>
-
-		            {% endfor %}</td>
+		            <td>{{row[0]}}</td>
+		            <td>{{row[1]}}</td>
+		            <td>{{row[2]}}</td>
+		            <td>{{row[3]}}</td>
 		        </tr>
 			{% endfor %}
 
 		</tbody>
 	</table>
+
+
+
 </form>
-
-
-
-	

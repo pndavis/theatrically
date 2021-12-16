@@ -13,12 +13,12 @@ app = Flask(__name__)
 
 
 @app.route('/')
-def my_form():
+def homepage():
     return render_template('homepage.html')
 
 @app.route('/moviesShowing', methods=['POST'])
-def my_form_post():
-    # createPosterDatabase()
+def moviesShowing():
+    
 
     startDate = request.form['startDate']
     numDays = request.form['numDays']
@@ -33,10 +33,12 @@ def my_form_post():
 
     if(jsonData == None):
         moviesShowing="Ran out of api calls"
+        return render_template("moviesShowing.html")
     else:
+        # createPosterDatabase(jsonData)
+        updatePosterDatabase(jsonData)
         moviesShowing = (dumpToDatabase(jsonData))
-
-    return render_template("moviesShowing.html",moviesShowing=moviesShowing)
+        return render_template("moviesShowing.html",moviesShowing=moviesShowing)
 
 @app.route('/showtimes', methods=['POST'])
 def returnMovieTimes():
@@ -51,6 +53,10 @@ def returnMovieTimes():
     times = searchDatabase(movieName, theatreName, movieInfo, alist, dolby, imax)
 
     return render_template("showtimes.html",showtimes=times)
+
+# @app.route('/movie/<string:id>',methods=['GET'])
+# def moviepage(id):
+#     return id
     
 
 if __name__ == "__main__":
