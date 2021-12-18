@@ -36,7 +36,7 @@ def moviesShowing():
         return render_template("moviesShowing.html")
     else:
         # createPosterDatabase(jsonData)
-        updatePosterDatabase(jsonData)
+        # updatePosterDatabase(jsonData)
         moviesShowing = (dumpToDatabase(jsonData))
         return render_template("moviesShowing.html",moviesShowing=moviesShowing)
 
