@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
+from flask_bootstrap import Bootstrap
 
 
 # <!-- <td>{{macros.datetime.strptime(row[0][1], "%Y-%m-%dT%H:%M").strftime("%b %d at %I:%M%p")}}</td> -->
@@ -8,9 +9,11 @@ from wtforms.validators import DataRequired
 
 from importjson import *
 
+# global movieList
+
 
 app = Flask(__name__)
-
+Bootstrap(app)
 
 @app.route('/')
 def homepage():
@@ -28,31 +31,44 @@ def moviesShowing():
     radius = request.form['radius']
     units = request.form['units']
 
-    jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
-    # jsonData = pullFromJson()
+    #jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
+    jsonData = pullFromJson()
 
     if(jsonData == None):
-        moviesShowing="Ran out of api calls"
-        return render_template("moviesShowing.html")
+        movieList = "Ran out of api calls"
+        return render_template("404.html")
     else:
         # createPosterDatabase(jsonData)
         # updatePosterDatabase(jsonData)
-        moviesShowing = (dumpToDatabase(jsonData))
-        return render_template("moviesShowing.html",moviesShowing=moviesShowing)
+        movieList = (dumpToDatabase(jsonData))
+        return render_template("moviesShowing.html",moviesShowing=movieList)
+
+    
+
+# @app.route('/moviesShowing')
+# def moviesShowingReturn():
+#     return render_template("moviesShowing.html",moviesShowing=movieList)
 
 @app.route('/showtimes', methods=['POST'])
 def returnMovieTimes():
 
-    movieName = request.form['movie']
-    theatreName = request.form['theater']
-    movieInfo = request.form['features']
-    alist = request.form.get('alist')
-    dolby = request.form.get('Dolby')
-    imax = request.form.get('Imax')
+    if request.form['action'] == 'home':
+        return render_template("homepage.html")
+    elif request.form['action'] == 'showings':
+        return render_template("moviesShowing.html")
+    elif request.form['action'] == 'findmovies':
+        
 
-    times = searchDatabase(movieName, theatreName, movieInfo, alist, dolby, imax)
+        movieName = request.form['movie']
+        theatreName = request.form['theater']
+        movieInfo = request.form['features']
+        alist = request.form.get('alist')
+        dolby = request.form.get('Dolby')
+        imax = request.form.get('Imax')
 
-    return render_template("showtimes.html",showtimes=times)
+        times = searchDatabase(movieName, theatreName, movieInfo, alist, dolby, imax)
+
+        return render_template("showtimes.html",showtimes=times)
 
 # @app.route('/movie/<string:id>',methods=['GET'])
 # def moviepage(id):

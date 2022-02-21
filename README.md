@@ -47,3 +47,4 @@ Todo
 *Home button and back button
 *Release year in general movies tab
 *Buy button for tickets
+*Alfred
