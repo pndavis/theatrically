@@ -1,38 +1,72 @@
+<head>
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+
+{% block content %}
+
 <form method="POST" action="/showtimes">
-	<style>
-		table {
-		  font-family: arial, sans-serif;
-		  border-collapse: collapse;
-		  width: 100%;
-		}
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+	  <a class="navbar-brand" href="#">Theatrically</a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+	    <span class="navbar-toggler-icon"></span>
+	  </button>
+	  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+	    <ul class="navbar-nav">
+	      <li class="nav-item active">
+	        <a class="nav-link" name="action" value="home" href="/">Home</a>
+	      </li>
+	      <li class="nav-item">
+	        <a class="nav-link" name="action" value="showings" href="#">Showings</a>
+	      </li>
+	      <li class="nav-item">
+	        <a class="nav-link" href="#">Theaters</a>
+	      </li>
+	    </ul>
+	  </div>
+	</nav>
 
-		td, th {
-		  border: 1px solid #dddddd;
-		  text-align: left;
-		  padding: 8px;
-		}
+	    <div class="row">
+	    	<div class="col">
+	 			<label for="movie">Search for showtimes for:</label>
+				<input type="text" id="movie" name="movie" placeholder="Dune">
+    		</div>
+    		<div class="col">
+				<label for="Dolby">AMC Only:</label>
+				<input type="checkbox" name="alist"/>
+    		</div>
+		</div>
 
-	</style>
-	<label for="movie">Search by movie:</label>
-	<input type="text" id="movie" name="movie" placeholder="Dune">
-	<label for="theater">Search by theater:</label>
-	<input type="text" id="theater" name="theater" placeholder="Siff">	
-	<label for="features">Search for showtime info:</label>
-	<input type="text" id="features" name="features" placeholder="eg Recliners or Subtitled">
-	<label for="Dolby">AMC Alist Only:</label>
-	<input type="checkbox" name="alist"/>
-	<label for="Dolby">Dolby Cinema:</label>
-	<input type="checkbox" name="Dolby"/>
-	<label for="Imax">IMAX:</label>
-	<input type="checkbox" name="Imax"/>
-	<input type="submit">
-	<table>
+		<div class="row">
+			<div class="col">
+				<label for="theater">Search by theater:</label>
+				<input type="text" id="theater" name="theater" placeholder="Siff">
+    		</div>
+    		<div class="col">
+				<label for="Dolby">Dolby Cinema:</label>
+				<input type="checkbox" name="Dolby"/>
+    		</div>
+		</div>
+
+		<div class="row">
+			<div class="col">
+				<label for="features">Search for showtime info:</label>
+				<input type="text" id="features" name="features" placeholder="eg Recliners or Subtitled">
+    		</div>
+    		<div class="col">
+				<label for="Imax">IMAX:</label>
+				<input type="checkbox" name="Imax"/>
+    		</div>
+		</div>
+		
+
+		<input class="btn btn-primary" type="submit" name="action" value="Find Movies">
+	<table class="table table-hover">
 	    <thead>
 	    <tr>
-	        <th>Movie</th>
-	        <th>Theater</th>
-	        <th>Time</th>
-	        <th>Details</th>
+	    	<th scope="col">Movie</th>
+	    	<th scope="col">Theater</th>
+	    	<th scope="col">Time</th>
+	    	<th scope="col">Details</th>
 	    </tr>
 	    </thead>
 	    <tbody>
@@ -48,8 +82,5 @@
 
 		</tbody>
 	</table>
-
-
-
 </form>
-
+{% endblock %}

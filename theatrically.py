@@ -23,15 +23,20 @@ def homepage():
 def moviesShowing():
     
 
+
     startDate = request.form['startDate']
     numDays = request.form['numDays']
     zipcode = request.form['zipcode']
-    lat = request.form['lat']
-    lng = request.form['lng']
+    # lat = request.form['lat']
+    # lng = request.form['lng']
     radius = request.form['radius']
-    units = request.form['units']
+    # units = request.form['units']
+    lat = ''
+    lng = ''
+    units = ''
 
-    #jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
+
+    # jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
     jsonData = pullFromJson()
 
     if(jsonData == None):
@@ -52,11 +57,13 @@ def moviesShowing():
 @app.route('/showtimes', methods=['POST'])
 def returnMovieTimes():
 
+    print(request.form['action'])
+
     if request.form['action'] == 'home':
         return render_template("homepage.html")
     elif request.form['action'] == 'showings':
         return render_template("moviesShowing.html")
-    elif request.form['action'] == 'findmovies':
+    elif request.form['action'] == 'Find Movies':
         
 
         movieName = request.form['movie']
@@ -69,6 +76,8 @@ def returnMovieTimes():
         times = searchDatabase(movieName, theatreName, movieInfo, alist, dolby, imax)
 
         return render_template("showtimes.html",showtimes=times)
+    else:
+        return render_template("404.html")
 
 # @app.route('/movie/<string:id>',methods=['GET'])
 # def moviepage(id):
