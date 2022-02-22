@@ -2,7 +2,7 @@ from flask import Flask, request, render_template
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
 from flask_bootstrap import Bootstrap
-
+from jinja2 import environment 
 
 # <!-- <td>{{macros.datetime.strptime(row[0][1], "%Y-%m-%dT%H:%M").strftime("%b %d at %I:%M%p")}}</td> -->
 
@@ -14,6 +14,16 @@ from importjson import *
 
 app = Flask(__name__)
 Bootstrap(app)
+
+@app.template_filter()
+def format_Month(value):
+    # 2022-02-21T16:00
+    return datetime.strptime(value, '%Y-%m-%dT%H:%M').strftime('%b %d')
+
+@app.template_filter()
+def format_Showtime(value):
+    # 2022-02-21T16:00
+    return datetime.strptime(value, '%Y-%m-%dT%H:%M').strftime('%m/%d at %-I:%M%p')
 
 @app.route('/')
 def homepage():
@@ -36,15 +46,15 @@ def moviesShowing():
     units = ''
 
 
-    # jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
-    jsonData = pullFromJson()
+    jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
+    # jsonData = pullFromJson()
 
     if(jsonData == None):
         movieList = "Ran out of api calls"
         return render_template("404.html")
     else:
         # createPosterDatabase(jsonData)
-        # updatePosterDatabase(jsonData)
+        updatePosterDatabase(jsonData)
         movieList = (dumpToDatabase(jsonData))
         return render_template("moviesShowing.html",moviesShowing=movieList)
 

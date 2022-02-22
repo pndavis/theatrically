@@ -8,7 +8,6 @@ from imdb import IMDb
 
 IMDbAPI = IMDb()
 
-
 def createDatabase():
 	con = sqlite3.connect('movietimes.sqlite')
 	cur = con.cursor()
@@ -86,11 +85,12 @@ def updatePosterDatabase(jsonData):
 		if(found == []):
 			print(fullMovieName + " looking for: " + movieName)
 			lookUpMovie = IMDbAPI.search_movie(movieName)
+			print("Imdb movie " lookUpMovie)
 			
 			try:
-				print("Found movie " + lookUpMovie[0].movieID)
 				currentMovie = IMDbAPI.get_movie(lookUpMovie[0].movieID)
 				posterURL = currentMovie.get('full-size cover url')
+				print("Found movie " + currentMovie)
 			except:
 				posterURL = "Movie_not_found"
 				print("Movie not found")
@@ -134,9 +134,6 @@ def getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units):
 		return jsonData
 	except:
 		return None
-	
-
-	
 
 
 def dumpToDatabase(jsonData):
@@ -190,15 +187,7 @@ def dumpToDatabase(jsonData):
 		whichTheaters = cursor.fetchall()
 
 
-		# print(''.join(map(str,DatabaseResults)))
 		DatabaseResults.append(whichTheaters)
-
-
-
-
-		# print(''.join(map(str,DatabaseResults)))
-		# print(''.join(map(str,DatabaseResults)) + ''.join(map(str,whichTheaters)))
-
 
 
 		moviesPlayingNearYou.append(DatabaseResults)
@@ -207,12 +196,9 @@ def dumpToDatabase(jsonData):
 	con.close()
 	
 
-	# moviesPlayingNearYou = moviesPlayingNearYou[0]
-	# print(moviesPlayingNearYou)
-	tosendback = sorted(moviesPlayingNearYou, key=lambda x: x[0][0].lower())
-	# print(tosendback)
-	return tosendback
 
+	tosendback = sorted(moviesPlayingNearYou, key=lambda x: x[0][0].lower())
+	return tosendback
 
 def searchDatabase(findmovie, theatreName, movieInfo, alist, dolby, imax):
 	con = sqlite3.connect('movietimes.sqlite')
@@ -231,7 +217,7 @@ def searchDatabase(findmovie, theatreName, movieInfo, alist, dolby, imax):
 	else:
 		imax = ''
 
-	query = """SELECT title, theatreName, STRFTIME('%m/%d at %H:%M', movieTime), generalSettings 
+	query = """SELECT title, theatreName, movieTime, generalSettings 
 				FROM movieTimeDB 
 				WHERE title LIKE '%'||?||'%' 
 				AND theatreName LIKE '%'||?||'%' 
@@ -271,8 +257,6 @@ def closeDatabase():
 	try:
 		# Save (commit) the changes
 		con.commit()
-		# We can also close the connection if we are done with it.
-		# Just be sure any changes have been committed or they will be lost.
 		con.close()
 	except:
 		pass
