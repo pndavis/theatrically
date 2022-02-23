@@ -58,6 +58,7 @@ def createPosterDatabase(jsonData):
 		# posterURL = "https://m.media-amazon.com/images/M/MV5BMzkwZWJhOTUtZTJkMC00OWQ5LTljZDctYzgxNWFiYjEyZjZiXkEyXkFqcGdeQXVyMDA4NzMyOA@@.jpg"
 
 		cursor.execute("INSERT INTO moviePosterDB VALUES (?, ?)", (fullMovieName, posterURL))
+		con.commit()
 		x+=1
 
 	con.commit()
@@ -69,34 +70,29 @@ def updatePosterDatabase(jsonData):
 	con = sqlite3.connect('movietimes.sqlite')
 	cursor = con.cursor()
 
-	jsonData = pullFromJson()
 	x = 0
 	while x < len(jsonData):
 
 		fullMovieName = jsonData[x]['title']
-		movieName = (jsonData[x]['title']).replace(': The IMAX 2D Experience', '')
-		movieName.replace(' -- The IMAX 2D Experience', '')
-
-
 		cursor.execute("SELECT title FROM moviePosterDB WHERE title=?", (fullMovieName,))
-		
 		found = cursor.fetchall()
 
 		if(found == []):
+			movieName = (fullMovieName).replace(': The IMAX 2D Experience', '')
+			movieName.replace(' -- The IMAX 2D Experience', '')
 			print(fullMovieName + " looking for: " + movieName)
 			lookUpMovie = IMDbAPI.search_movie(movieName)
-			print("Imdb movie " lookUpMovie)
 			
 			try:
 				currentMovie = IMDbAPI.get_movie(lookUpMovie[0].movieID)
 				posterURL = currentMovie.get('full-size cover url')
-				print("Found movie " + currentMovie)
 			except:
 				posterURL = "Movie_not_found"
 				print("Movie not found")
 			print(posterURL)
 
 			cursor.execute("INSERT INTO moviePosterDB VALUES (?, ?)", (fullMovieName, posterURL))
+			con.commit()
 		x+=1
 	con.commit()
 	con.close()
