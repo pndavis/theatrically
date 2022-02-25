@@ -26,10 +26,6 @@
 		  </div>
 		</nav>
 
-		<script>
-			$('.datepicker').datepicker();
-		</script>
-
 	    <div class="row">
 	    	<div class="col">
 	 			<label for="movie">Search for showtimes for:</label>
@@ -83,13 +79,15 @@
 		  <tbody>
 		    {% for row in moviesShowing %}
 			    <tr>
-			    	{% if row[1] != "" %}
+			    	{% if row[1] != "" and row[0] != "Movie_not_found"%}
         				<td><a href={{row[1]}}><img src={{row[0]}} width="50" height="100"></a></td> 
-    				{% else %}
+    				{% elif row[0] != "Movie_not_found"%}
     					<td><img src={{row[0]}} width="50" height="100"></td>
+					{% else %}
+						<td><img src="/static/img/indie.png" width="50" height="100"></td>
     				{% endif %}
 
-    				<td>{{row[2]}}</td> 
+    				<td><a href="/movie/{{row[11]}}">{{row[2]}}</a></td> 
     				<td>{{row[3]}}</td> 
     				<td>{{row[5]}}</td> 
     				<td>{{row[6]}}</td> 

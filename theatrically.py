@@ -73,7 +73,7 @@ def returnMovieTimes():
     if request.form['action'] == 'home':
         return render_template("homepage.html")
     elif request.form['action'] == 'showings':
-        return render_template("moviesShowing.html")
+        return render_template("moviesShowing.html",moviesShowing=movieList)
     elif request.form['action'] == 'Find Movies':
         
 
@@ -90,9 +90,13 @@ def returnMovieTimes():
     else:
         return render_template("404.html")
 
-# @app.route('/movie/<string:id>',methods=['GET'])
-# def moviepage(id):
-#     return id
+@app.route('/movie/<movieid>')
+def profile(movieid):
+    oneInfo = returnOneMoviesInfo(movieid)
+    oneShowtimes = returnOneMoviesTimes(movieid)
+    print(oneInfo)
+    print(oneShowtimes)
+    return render_template("moviepage.html", movieInfo=oneInfo, movieTime=oneShowtimes)
     
 
 if __name__ == "__main__":

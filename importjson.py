@@ -143,12 +143,7 @@ def getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units):
 def dumpToDatabase(jsonData):
 	connect, cursor = createDatabase()
 
-	moviesPlayingNearYou = []
-	# print("the jason file has a length of ")
-	# print(len(jsonData))
 	x = 0
-	print(len(jsonData))
-	print("hello")
 	while x < len(jsonData):
 		tmsId = jsonData[x]['tmsId']
 		currenttitle = jsonData[x]['title']
@@ -194,17 +189,12 @@ def dumpToDatabase(jsonData):
 		except:
 			officialUrl = ''
 
-
-		
-
 		cursor.execute("SELECT posterURL FROM moviePosterDB WHERE title=?", (currenttitle,))
 		posterURL = cursor.fetchall()
 		try:
 			posterURL = posterURL[0][0]
 		except:
 			posterURL = ''
-
-
 
 		currenttheatre = ""
 		theaterCount = 0
@@ -248,7 +238,6 @@ def dumpToDatabase(jsonData):
 		while j < i:
 			whichTheatersReturn = whichTheatersReturn + ", " + whichTheaters[j][0]
 			j+=1
-		# print(whichTheatersReturn)
 
 		#(tmsId text, title text, shortDescription text, rating text, advisories text, runTime text, officialUrl text, posterURL text, genres text, directors text, topCast text, releaseYear text, releaseDate date, 
 	    #           showingsStart text, showingsEnd text, theatresShowing text)''')
@@ -272,31 +261,7 @@ def dumpToDatabase(jsonData):
 
 		cursor.execute("INSERT INTO movieInfoDB VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (tmsId, currenttitle, shortDescription, rating, advisories, runTime, officialUrl, posterURL, genres, directors, topCast, releaseYear, releaseDate, showingsStart, showingsEnd, whichTheatersReturn))
 
-
-		# cursor.execute("SELECT title, MIN(movieTime) AS First, MAX(movieTime) AS Last, posterURL, officialUrl FROM movieTimeDB WHERE title = ?", (currenttitle,))
-		
-		# DatabaseResults = cursor.fetchall()
-		
-
-		# DatabaseResults.append(whichTheaters)
-
-
-		# moviesPlayingNearYou.append(DatabaseResults)
 		x+=1
-
-	# cursor.execute("SELECT COUNT(DISTINCT title) FROM movieTimeDB")
-	# print("the cursor says length of ")
-	# cur = cursor.fetchall()
-	# print(cur)
-	# print(jsonData[cur[0][0]]['title'])
-	# print(jsonData[len(jsonData)]['title'])
-
-	# moviesPlayingNearYou = cursor.execute("SELECT posterURL, officialUrl, title, rating, runTime, directors, releaseYear, shortDescription, showingsStart, showingsEnd, theatresShowing FROM movieInfoDB")
-
-
-	# tosendback = sorted(moviesPlayingNearYou, key=lambda x: x[2].lower()) #Sort by title which is the 3rd element in query
-	
-	# print(tosendback)
 
 	connect.commit()
 	connect.close()
@@ -304,10 +269,29 @@ def dumpToDatabase(jsonData):
 def returnMoviesShowing():
 	connect = sqlite3.connect('movietimes.sqlite')
 	cursor = connect.cursor()
-	moviesPlayingNearYou = cursor.execute("SELECT posterURL, officialUrl, title, rating, runTime, directors, releaseYear, shortDescription, showingsStart, showingsEnd, theatresShowing FROM movieInfoDB")
+	cursor.execute("SELECT posterURL, officialUrl, title, rating, runTime, directors, releaseYear, shortDescription, showingsStart, showingsEnd, theatresShowing, tmsId FROM movieInfoDB")
+	moviesPlayingNearYou = cursor.fetchall()
 	tosendback = sorted(moviesPlayingNearYou, key=lambda x: x[2].lower()) #Sort by title which is the 3rd element in query
 	connect.close()
 	return tosendback
+
+def returnOneMoviesInfo(movieid):
+	connect = sqlite3.connect('movietimes.sqlite')
+	cursor = connect.cursor()
+	cursor.execute("SELECT posterURL, officialUrl, title, rating, runTime, directors, releaseYear, shortDescription, showingsStart, showingsEnd, theatresShowing, tmsId FROM movieInfoDB WHERE tmsId = ?", (movieid,))
+	moviesPlayingNearYou = cursor.fetchall()
+	tosendback = sorted(moviesPlayingNearYou, key=lambda x: x[2].lower()) #Sort by title which is the 3rd element in query
+	connect.close()
+	return tosendback
+
+def returnOneMoviesTimes(movieid):
+	connect = sqlite3.connect('movietimes.sqlite')
+	cursor = connect.cursor()
+	cursor.execute("SELECT theatreName, theatreID, movieTime, generalSettings, bargin, ticketURL FROM movieTimeDB WHERE tmsId = ?", (movieid,))
+	showtimes = cursor.fetchall()
+	connect.close()
+	print(showtimes)
+	return showtimes
 
 def searchDatabase(findmovie, theatreName, movieInfo, alist, dolby, imax):
 	connect = sqlite3.connect('movietimes.sqlite')
