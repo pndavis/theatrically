@@ -55,4 +55,4 @@ for theater, details in seattle_theaters.items():
 LocateControl(auto_start=False).add_to(theater_map)
 
 # Save the map
-theater_map.save('theater-map.html')
+theater_map.save('map-of-theaters.html')
