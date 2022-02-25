@@ -70,7 +70,11 @@
 		  <thead>
 		    <tr>
 		    	<th scope="col">Movies showing in your area:</th>
-		        <th scope="col"></th>
+		        <th scope="col">Title</th>
+		        <th scope="col">Rating</th>
+		        <th scope="col">Director</th>
+		        <th scope="col">Release Year</th>
+		        <th scope="col">Description</th>
 		        <th scope="col">Local Showings Start:</th>
 		        <th scope="col">Local Showings End:</th>
 		        <th scope="col">Showing at:</th>
@@ -79,22 +83,21 @@
 		  <tbody>
 		    {% for row in moviesShowing %}
 			    <tr>
-			    	{% if row[0][4] != "" %}
-        				<td><a href={{row[0][4]}}><img src={{row[0][3]}} width="50" height="100"></a></td> 
+			    	{% if row[1] != "" %}
+        				<td><a href={{row[1]}}><img src={{row[0]}} width="50" height="100"></a></td> 
     				{% else %}
-    					<td><img src={{row[0][3]}} width="50" height="100"></td>
+    					<td><img src={{row[0]}} width="50" height="100"></td>
     				{% endif %}
 
-    				<td>{{row[0][0]}}</td> 
+    				<td>{{row[2]}}</td> 
+    				<td>{{row[3]}}</td> 
+    				<td>{{row[5]}}</td> 
+    				<td>{{row[6]}}</td> 
+    				<td>{{row[7]}}</td> 
+		            <td>{{row[8]|format_Month}}</td>
+		            <td>{{row[9]|format_Month}}</td>
+		            <td>{{row[10]}}</td>
 
-		            <td>{{row[0][1]|format_Month}}</td>
-		            <td>{{row[0][2]|format_Month}}</td>
-		            
-
-
-		            <td>{% for x in row[1] %}
-	            		<a>{{x[0]}}; </a>
-		            {% endfor %}</td>
 		        </tr>
 			{% endfor %}
 		  </tbody>

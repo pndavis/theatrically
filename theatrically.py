@@ -46,8 +46,8 @@ def moviesShowing():
     units = ''
 
 
-    jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
-    # jsonData = pullFromJson()
+    # jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
+    jsonData = pullFromJson()
 
     if(jsonData == None):
         movieList = "Ran out of api calls"
@@ -55,7 +55,8 @@ def moviesShowing():
     else:
         # createPosterDatabase(jsonData)
         updatePosterDatabase(jsonData)
-        movieList = (dumpToDatabase(jsonData))
+        dumpToDatabase(jsonData)
+        movieList = returnMoviesShowing()
         return render_template("moviesShowing.html",moviesShowing=movieList)
 
     
