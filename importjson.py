@@ -1,7 +1,7 @@
 import json
 import requests
 from datetime import datetime
-# import config
+import config
 import sqlite3
 from imdb import IMDb
 

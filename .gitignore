@@ -21,3 +21,4 @@ movietimes.sqlite
 nyc90.json
 moviePosters.sqlite
 movietimes.sqlite-journal
+venv/
