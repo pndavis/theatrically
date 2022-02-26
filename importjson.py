@@ -129,10 +129,13 @@ def getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units):
 	imageSize = ''
 	imageText = ''
 	market = ''
-	api = config.api_key
+	try:
+		api = config.api_key
+	except:
+		api = os.environ["api_key"]
 
 	gracenote = 'http://data.tmsapi.com/v1.1/movies/showings?' + startDate + numDays + zipcode + radius + api
-	print(gracenote)
+	# print(gracenote)
 	response = requests.get(gracenote)
 
 	try:
