@@ -109,7 +109,6 @@ def updatePosterDatabase(jsonData):
 	connect.close()
 	print("Poster Database updated")
 
-
 def pullFromJson():
 	f = open('90days.json')
 	jsonData = json.load(f)
@@ -194,12 +193,12 @@ def dumpToDatabase(jsonData):
 		except:
 			officialUrl = ''
 
-		cursor.execute("SELECT posterURL FROM moviePosterDB WHERE title=?", (currenttitle,))
-		posterURL = cursor.fetchall()
-		try:
-			posterURL = posterURL[0][0]
-		except:
-			posterURL = ''
+		# cursor.execute("SELECT posterURL FROM moviePosterDB WHERE title=?", (currenttitle,))
+		posterURL = ''#cursor.fetchall()
+		# try:
+		# 	posterURL = posterURL[0][0]
+		# except:
+		# 	posterURL = ''
 
 		currenttheatre = ""
 		theaterCount = 0
