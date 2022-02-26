@@ -1,8 +1,7 @@
 import json
 import requests
 from datetime import datetime
-import config
-import pandas as pd
+# import config
 import sqlite3
 from imdb import IMDb
 
@@ -98,6 +97,8 @@ def updatePosterDatabase(jsonData):
 			except:
 				posterURL = "Movie_not_found"
 				print("Movie not found")
+			if(posterURL == None):
+				posterURL = "Movie_not_found"
 			print(posterURL)
 
 			cursor.execute("INSERT INTO moviePosterDB VALUES (?, ?)", (fullMovieName, posterURL))
@@ -242,23 +243,6 @@ def dumpToDatabase(jsonData):
 		#(tmsId text, title text, shortDescription text, rating text, advisories text, runTime text, officialUrl text, posterURL text, genres text, directors text, topCast text, releaseYear text, releaseDate date, 
 	    #           showingsStart text, showingsEnd text, theatresShowing text)''')
 
-		# print(tmsId)
-		# print(currenttitle)
-		# print(shortDescription)
-		# print(rating)
-		# print(advisories)
-		# print(runTime)
-		# print(officialUrl)
-		# print(posterURL)
-		# print(genres)
-		# print(directors)
-		# print(topCast)
-		# print(releaseYear)
-		# print(releaseDate)
-		# print(showingsStart)
-		# print(showingsEnd)
-		# print(whichTheatersReturn)
-
 		cursor.execute("INSERT INTO movieInfoDB VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (tmsId, currenttitle, shortDescription, rating, advisories, runTime, officialUrl, posterURL, genres, directors, topCast, releaseYear, releaseDate, showingsStart, showingsEnd, whichTheatersReturn))
 
 		x+=1
@@ -290,7 +274,6 @@ def returnOneMoviesTimes(movieid):
 	cursor.execute("SELECT theatreName, theatreID, movieTime, generalSettings, bargin, ticketURL FROM movieTimeDB WHERE tmsId = ?", (movieid,))
 	showtimes = cursor.fetchall()
 	connect.close()
-	print(showtimes)
 	return showtimes
 
 def searchDatabase(findmovie, theatreName, movieInfo, alist, dolby, imax):

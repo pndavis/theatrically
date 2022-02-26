@@ -1,6 +1,4 @@
 from flask import Flask, request, render_template
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired
 from flask_bootstrap import Bootstrap
 from jinja2 import environment 
 
@@ -8,9 +6,6 @@ from jinja2 import environment
 
 
 from importjson import *
-
-# global movieList
-
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -25,15 +20,21 @@ def format_Showtime(value):
     # 2022-02-21T16:00
     return datetime.strptime(value, '%Y-%m-%dT%H:%M').strftime('%m/%d at %-I:%M%p')
 
+    PT01H52M
+@app.template_filter()
+def format_Runtime(value):
+    # PT01H37M
+    try:
+        return datetime.strptime(value, 'PT%HH%MM').strftime('%Hh %Mm')
+    except:
+        return value
+
 @app.route('/')
 def homepage():
     return render_template('homepage.html')
 
 @app.route('/moviesShowing', methods=['POST'])
 def moviesShowing():
-    
-
-
     startDate = request.form['startDate']
     numDays = request.form['numDays']
     zipcode = request.form['zipcode']
@@ -45,9 +46,8 @@ def moviesShowing():
     lng = ''
     units = ''
 
-
-    # jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
-    jsonData = pullFromJson()
+    jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
+    # jsonData = pullFromJson()
 
     if(jsonData == None):
         movieList = "Ran out of api calls"
@@ -59,11 +59,10 @@ def moviesShowing():
         movieList = returnMoviesShowing()
         return render_template("moviesShowing.html",moviesShowing=movieList)
 
-    
-
-# @app.route('/moviesShowing')
-# def moviesShowingReturn():
-#     return render_template("moviesShowing.html",moviesShowing=movieList)
+@app.route('/movielist')
+def movieList():
+    movieList = returnMoviesShowing()
+    return render_template("moviesShowing.html",moviesShowing=movieList)
 
 @app.route('/showtimes', methods=['POST'])
 def returnMovieTimes():
