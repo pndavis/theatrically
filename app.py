@@ -46,8 +46,8 @@ def moviesShowing():
     lng = ''
     units = ''
 
-    # jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
-    jsonData = pullFromJson()
+    jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
+    # jsonData = pullFromJson()
 
     if(jsonData == None):
         movieList = "Ran out of api calls"
