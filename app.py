@@ -46,8 +46,8 @@ def moviesShowing():
     lng = ''
     units = ''
 
-    jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
-    # jsonData = pullFromJson()
+    # jsonData = getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units)
+    jsonData = pullFromJson()
 
     if(jsonData == None):
         movieList = "Ran out of api calls"
@@ -93,10 +93,13 @@ def returnMovieTimes():
 def profile(movieid):
     oneInfo = returnOneMoviesInfo(movieid)
     oneShowtimes = returnOneMoviesTimes(movieid)
-    print(oneInfo)
-    print(oneShowtimes)
+    # print(oneInfo)
+    # print(oneShowtimes)
     return render_template("moviepage.html", movieInfo=oneInfo, movieTime=oneShowtimes)
-    
+
+@app.route('/about')
+def about():
+	return render_template("about.html")
 
 if __name__ == "__main__":
     app.run()

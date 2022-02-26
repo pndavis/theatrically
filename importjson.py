@@ -296,7 +296,9 @@ def searchDatabase(findmovie, theatreName, movieInfo, alist, dolby, imax):
 	else:
 		imax = ''
 
-	query = """SELECT title, theatreName, movieTime, generalSettings 
+	# (tmsId text, title text, theatreName text, theatreID text, movieTime date, generalSettings text, officialUrl text, posterURL text, bargin text, ticketURL text)''')
+
+	query = """SELECT title, theatreName, movieTime, generalSettings, bargin, ticketURL
 				FROM movieTimeDB 
 				WHERE title LIKE '%'||?||'%' 
 				AND theatreName LIKE '%'||?||'%' 
