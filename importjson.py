@@ -3,6 +3,7 @@ import requests
 from datetime import datetime
 import config
 import sqlite3
+import os
 from imdb import IMDb
 
 IMDbAPI = IMDb()
