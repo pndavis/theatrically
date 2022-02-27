@@ -1,83 +1,156 @@
-{% extends "base.html" %}
-{% block body %}
-<form method="POST" action="/showtimes">
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Theatrically</title>
 
-	{% block refineSearch %}
-	  <div class="row">
-	    <div class="col">
-	    <label for="movie">Refine by title:</label>
-	    <input type="text" id="movie" name="movie" placeholder="Spider-Man">
-	    </div>
-	    <div class="col">
-	    <label for="Dolby">AMC Only:</label>
-	    <input type="checkbox" name="alist"/>
-	    </div>
-	</div>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.css">
+  </head>
 
-	<div class="row">
-	  <div class="col">
-	    <label for="theater">Refine by theater:</label>
-	    <input type="text" id="theater" name="theater" placeholder="Siff">
-	    </div>
-	    <div class="col">
-	    <label for="Dolby">Dolby Cinema:</label>
-	    <input type="checkbox" name="Dolby"/>
-	    </div>
-	</div>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="/">Theatrically</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+          <li class="nav-item active">
+            <a class="nav-link" value="home" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/movielist">Showings</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="/about">About</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="wrapper container">
+      <form method="POST" action="/showtimes">
+          <div class="row">
+            <div class="col">
+            <label for="movie">Refine by title:</label>
+            <input type="text" id="movie" name="movie" placeholder="Spider-Man">
+            </div>
+            <div class="col">
+            <label for="Dolby">AMC Only:</label>
+            <input type="checkbox" name="alist"/>
+            </div>
+        </div>
 
-	<div class="row">
-	  <div class="col">
-	    <label for="features">Refine by showtime info:</label>
-	    <input type="text" id="features" name="features" placeholder="eg Recliners or Subtitled">
-	    </div>
-	    <div class="col">
-	    <label for="Imax">IMAX:</label>
-	    <input type="checkbox" name="Imax"/>
-	    </div>
-	</div>
-	{% endblock %}
+        <div class="row">
+          <div class="col">
+            <label for="theater">Refine by theater:</label>
+            <input type="text" id="theater" name="theater" placeholder="Siff">
+            </div>
+            <div class="col">
+            <label for="Dolby">Dolby Cinema:</label>
+            <input type="checkbox" name="Dolby"/>
+            </div>
+        </div>
 
-	<input class="btn btn-primary" type="submit" name="action" value="Find Movies">
+        <div class="row">
+          <div class="col">
+            <label for="features">Refine by showtime info:</label>
+            <input type="text" id="features" name="features" placeholder="eg Recliners or Subtitled">
+            </div>
+            <div class="col">
+            <label for="Imax">IMAX:</label>
+            <input type="checkbox" name="Imax"/>
+            </div>
+        </div>
+        <input class="btn btn-primary" type="submit" name="action" value="Find Movies">
+      </form>
+      <table
+        id="table"
+        data-toggle="table"
+        data-search="true"
+        data-toolbar="#toolbar"
+        data-show-columns="true"
+        data-show-columns-toggle-all="true"
+        data-buttons-align="right"
+        data-mobile-responsive="true"
+        data-show-footer="true"
+        data-detail-view="true"
+        data-detail-view-by-click="true"
+        data-detail-view-icon="false"
+        stickyHeader="true"
+        >
 
-	<table class="table table-hover">
-	  <thead>
-	    <tr>
-	    	<th scope="col">Movies showing in your area:</th>
-	        <th scope="col">Title</th>
-	        <th scope="col">Rating</th>
-	        <th scope="col">Runtime</th>
-	        <th scope="col">Director</th>
-	        <th scope="col">Release Year</th>
-	        <th scope="col">Description</th>
-	        <th scope="col">Local Showings Start:</th>
-	        <th scope="col">Local Showings End:</th>
-	        <th scope="col">Showing at:</th>
-	    </tr>
-	  </thead>
-	  <tbody>
-	    {% for row in moviesShowing %}
-		    <tr>
-		    	{% if row[1] != "" and row[0] != "Movie_not_found"%}
-    				<td><a href={{row[1]}}><img src={{row[0]}} width="50" height="100"></a></td> 
-				{% elif row[0] != "Movie_not_found"%}
-					<td><img src={{row[0]}} width="50" height="100"></td>
-				{% else %}
-					<td><img src="/static/img/indie.png" width="50" height="100"></td>
-				{% endif %}
+        <thead>
+          <tr>
+            <th data-field="Poster" data-switchable="false" data-visible="false" data-card-visible="false">Poster</th>
+            <th data-field="Title" data-sortable="true" data-switchable="false" data-filter-control-visible="false"data-formatter="linkFormatter" data-footer-formatter="titleLength">Title</th>
+            <th data-field="Rating">Rating</th>
+            <th data-field="Runtime" data-sortable="true" >Runtime</th>
+            <th data-field="Director" data-sortable="true">Director</th>
+            <th data-field="ReleaseYear" data-sortable="true">Release Year</th>
+            <th data-field="Description">Description</th>
+            <th data-field="ShowingsStart" data-visible="false">Local Showings Start</th>
+            <th data-field="ShowingsEnd" data-visible="false">Local Showings End</th>
+            <th data-field="Showingat" data-formatter="shortingText" data-detail-formatter="fullMovies">Showing at</th>
+            <th data-field="MovieID" data-visible="false">Movie ID</th>
+          </tr>
+        </thead>
+        <tbody> 
+          {% for row in moviesShowing %}
+            <tr>
+            {% if row[1] != "" and row[0] != "Movie_not_found"%}
+                <td><a href={{row[1]}}><img src={{row[0]}} width="50" height="100"></a></td> 
+            {% elif row[0] != "Movie_not_found"%}
+              <td><img src={{row[0]}} width="50" height="100"></td>
+            {% else %}
+              <td><img src="/static/img/indie.png" width="50" height="100"></td>
+            {% endif %}
 
-				<td><a href="/movie/{{row[11]}}">{{row[2]}}</a></td> 
-				<td>{{row[3]}}</td> 
-				<td>{{row[4]|format_Runtime}}</td> 
-				<td>{{row[5]}}</td> 
-				<td>{{row[6]}}</td> 
-				<td>{{row[7]}}</td> 
-	            <td>{{row[8]|format_Month}}</td>
-	            <td>{{row[9]|format_Month}}</td>
-	            <td>{{row[10]}}</td>
+            <td>{{row[2]}}</td> 
+            <td>{{row[3]}}</td> 
+            <td>{{row[4]|format_Runtime}}</td> 
+            <td>{{row[5]}}</td> 
+            <td>{{row[6]}}</td> 
+            <td>{{row[7]}}</td> 
+            <td>{{row[8]|format_Month}}</td>
+            <td>{{row[9]|format_Month}}</td>
+            <td>{{row[10]}}</td>
+            <td>{{row[11]}}</td>
 
-	        </tr>
-		{% endfor %}
-	  </tbody>
-	</table>
-</form>
-{% endblock %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.19.1/dist/extensions/mobile/bootstrap-table-mobile.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.19.1/dist/extensions/sticky-header/bootstrap-table-sticky-header.min.js"></script>
+    <script>
+      function shortingText(value) {
+        if(value.length <= 100) {
+          return value;
+        }
+        
+        return value.substring(0, 100) + ' (Click for more)';
+
+      }
+      function linkFormatter(value, row) {
+        return '<a href="/movie/' + row.MovieID + '">' + value + '</a>'
+        }
+      function titleLength(data) {
+          return data.length + ' Movies'
+        }
+      function fullMovies(index, row) {
+          return 'Showing at: ' + row.Showingat
+        }
+    </script>
+  </body>
+</html>

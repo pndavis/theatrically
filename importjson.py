@@ -240,7 +240,7 @@ def dumpToDatabase(jsonData):
 		j = 1
 		whichTheatersReturn = whichTheaters[0][0]
 		while j < i:
-			whichTheatersReturn = whichTheatersReturn + ", " + whichTheaters[j][0]
+			whichTheatersReturn = whichTheatersReturn + "; " + whichTheaters[j][0]
 			j+=1
 
 		#(tmsId text, title text, shortDescription text, rating text, advisories text, runTime text, officialUrl text, posterURL text, genres text, directors text, topCast text, releaseYear text, releaseDate date, 
@@ -298,7 +298,7 @@ def searchDatabase(findmovie, theatreName, movieInfo, alist, dolby, imax):
 
 	# (tmsId text, title text, theatreName text, theatreID text, movieTime date, generalSettings text, officialUrl text, posterURL text, bargin text, ticketURL text)''')
 
-	query = """SELECT title, theatreName, movieTime, generalSettings, bargin, ticketURL
+	query = """SELECT title, theatreName, movieTime, generalSettings, bargin, ticketURL, tmsId
 				FROM movieTimeDB 
 				WHERE title LIKE '%'||?||'%' 
 				AND theatreName LIKE '%'||?||'%' 
