@@ -69,7 +69,7 @@ def returnMovieTimes():
     movieInfo = request.form['features']
     amc = request.form.get('amc')
     dolby = request.form.get('Dolby')
-    imax = request.form.get('Imax')
+    imax = request.form.get('IMAX')
 
     times = searchDatabase(movieName, theatreName, movieInfo, amc, dolby, imax)
 
