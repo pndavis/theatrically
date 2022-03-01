@@ -1,64 +1,89 @@
 {% extends "base.html" %}
 {% block body %}
-<form method="POST" action="/showtimes">
-  <div class="row justify-content-center">
-    <div class="col">              
-      <label for="movie" class="form-group">Refine by title:</label>
-      <input type="text" class="form-control" id="movie" name="movie" placeholder="Spider-Man">
-    </div>
-    <div class="col">
-      <label for="theater" class="form-group">Refine by theater:</label>
-      <input type="text" class="form-control" id="theater" name="theater" placeholder="Siff">
-    </div>
-    <div class="col">
-      <label for="features" class="form-group">Refine by showtime info:</label>
-      <input type="text" class="form-control" id="features" name="features" placeholder="eg Recliners or Subtitled">
-    </div>
-	</div>
-	<div class="form-check form-switch form-check-inline">
-	  <input class="form-check-input" type="checkbox" id="amc" name="amc">
-	  <label class="form-check-label" for="amc">AMC Only</label>
-	</div>
-	<div class="form-check form-switch form-check-inline">
-	  <input class="form-check-input" type="checkbox" id="Dolby" name="Dolby">
-	  <label class="form-check-label" for="Dolby">Dolby Cinema</label>
-	</div>
-	<div class="form-check form-switch form-check-inline">
-	  <input class="form-check-input" type="checkbox" id="IMAX" name="IMAX">
-	  <label class="form-check-label" for="IMAX">IMAX</label>
-	</div>
+<div class="wrapper container">
+	<form method="POST" action="/showtimes">
+	  <div class="row justify-content-center">
+	    <div class="col">              
+	      <label for="movie" class="form-group">Refine by title:</label>
+	      <input type="text" class="form-control" id="movie" name="movie" placeholder="Spider-Man">
+	    </div>
+	    <div class="col">
+	      <label for="theater" class="form-group">Refine by theater:</label>
+	      <input type="text" class="form-control" id="theater" name="theater" placeholder="Siff">
+	    </div>
+	    <div class="col">
+	      <label for="features" class="form-group">Refine by showtime info:</label>
+	      <input type="text" class="form-control" id="features" name="features" placeholder="eg Recliners or Subtitled">
+	    </div>
+		</div>
+		<div class="form-check form-switch form-check-inline">
+		  <input class="form-check-input" type="checkbox" id="amc" name="amc">
+		  <label class="form-check-label" for="amc">AMC Only</label>
+		</div>
+		<div class="form-check form-switch form-check-inline">
+		  <input class="form-check-input" type="checkbox" id="Dolby" name="Dolby">
+		  <label class="form-check-label" for="Dolby">Dolby Cinema</label>
+		</div>
+		<div class="form-check form-switch form-check-inline">
+		  <input class="form-check-input" type="checkbox" id="IMAX" name="IMAX">
+		  <label class="form-check-label" for="IMAX">IMAX</label>
+		</div>
 
-  <div class="d-flex justify-content-start">
-  	<button type="submit" class="btn btn-primary mb-2">Find Showings</button>
-  </div>   
-</form>
-		
-<table class="table table-hover">
-    <thead>
-    <tr>
-    	<th scope="col">Movie</th>
-    	<th scope="col">Theater</th>
-    	<th scope="col">Time</th>
-    	<th scope="col">Details</th>
-    	<th scope="col">Buy Tickets</th>
-    </tr>
-    </thead>
-    <tbody>
+	  <div class="d-flex justify-content-start">
+	  	<button type="submit" class="btn btn-primary mb-2">Find Showings</button>
+	  </div>   
+	</form>
+	<table
+	  id="table"
+	  data-toggle="table"
+	  data-search="true"
+	  data-toolbar="#toolbar"
+	  data-show-columns="true"
+	  data-show-columns-toggle-all="true"
+	  data-buttons-align="right"
+	  data-mobile-responsive="true"
+	  data-show-footer="true"
+	  >
 
-		{% for row in showtimes %}
+	  <thead>
+	    <tr>
+	       <th data-field="Title" data-sortable="true" data-switchable="false" data-filter-control-visible ="false"data-formatter="linkFormatter" data-footer-formatter="titleLength">Title</th>
+	      <th data-field="Theater" data-sortable="true" >Theater</th>
+	      <th data-field="Time" data-sortable="true" >Time</th>
+	      <th data-field="Details" >Details</th>
+	      <th data-field="Buy Tickets" >Buy Tickets</th>
+	      <th data-field="MovieID" data-visible="false">Movie ID</th>
+	    </tr>
+	  </thead>
+	  <tbody> 
+  		{% for row in showtimes %}
 		    <tr>
-	            <td><a href="/movie/{{row[6]}}">{{row[0]}}</a></td> 
-	            <td>{{row[1]}}</td>
-	            <td>{{row[2]|format_Showtime}}</td>
-	            <td>{{row[3]}}</td>
-	            {% if row[5] != ''%}
-	            	<td><a href={{row[5]}}>Buy Tickets</a></td>
-            	{% else %}
-            		<td></td>
-            	{% endif %}
-	        </tr>
-		{% endfor %}
+          <td>{{row[0]}}</td> 
+          <td>{{row[1]}}</td>
+          <td>{{row[2]|format_Showtime}}</td>
+          <td>{{row[3]}}</td>
+          {% if row[5] != ''%}
+          	<td><a href="{{row[5]}}" target="_blank">Buy Tickets</a></td>
+        	{% else %}
+        		<td></td>
+        	{% endif %}
+        	<td>{{row[6]}}</td>
+        </tr>
+  		{% endfor %}
+	  </tbody>
+	</table>
 
-	</tbody>
-</table>
+	<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+	<script src="https://unpkg.com/bootstrap-table@1.19.1/dist/bootstrap-table.min.js"></script>
+	<script src="https://unpkg.com/bootstrap-table@1.19.1/dist/extensions/mobile/bootstrap-table-mobile.min.js"></script>
+	<script>
+	  function linkFormatter(value, row) {
+	    return '<a href="/movie/' + row.MovieID + '">' + value + '</a>'
+	    }
+	  function titleLength(data) {
+	      return data.length + ' Showings'
+	    }
+	</script>
+</div>
 {% endblock %}
