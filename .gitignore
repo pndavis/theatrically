@@ -23,3 +23,5 @@ moviePosters.sqlite
 movietimes.sqlite-journal
 venv/
 templates/testtable.html
+test.py
+
