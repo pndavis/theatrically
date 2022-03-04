@@ -265,7 +265,7 @@ def returnMoviesShowing():
 def returnOneMoviesInfo(movieid):
 	connect = sqlite3.connect('movietimes.sqlite')
 	cursor = connect.cursor()
-	cursor.execute("SELECT posterURL, officialUrl, title, rating, runTime, directors, releaseYear, shortDescription, showingsStart, showingsEnd, theatresShowing, tmsId FROM movieInfoDB WHERE tmsId = ?", (movieid,))
+	cursor.execute("SELECT posterURL, officialUrl, title, rating, runTime, directors, releaseDate, shortDescription, showingsStart, showingsEnd, theatresShowing, tmsId FROM movieInfoDB WHERE tmsId = ?", (movieid,))
 	moviesPlayingNearYou = cursor.fetchall()
 	tosendback = sorted(moviesPlayingNearYou, key=lambda x: x[2].lower()) #Sort by title which is the 3rd element in query
 	connect.close()
