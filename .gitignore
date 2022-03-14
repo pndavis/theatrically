@@ -25,3 +25,5 @@ venv/
 templates/testtable.html
 test.py
 
+painpoints.md
+request.py
