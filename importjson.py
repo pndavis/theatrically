@@ -8,141 +8,47 @@ from imdb import IMDb
 
 IMDbAPI = IMDb()
 
-def createDatabase():
-	connect = sqlite3.connect('movietimes.sqlite')
-	cursor = connect.cursor()
-
-	try:
-		cursor.execute('DROP TABLE movieTimeDB')
-	except:
-		pass
-	try:
-		cursor.execute('DROP TABLE movieInfoDB')
-	except:
-		pass
-
-	cursor.execute('''CREATE TABLE movieTimeDB
-				(tmsId text, title text, theatreName text, theatreID text, movieTime date, generalSettings text, officialUrl text, posterURL text, bargin text, ticketURL text)''')
-	
-	cursor.execute('''CREATE TABLE movieInfoDB
-	               (tmsId text, title text, shortDescription text, rating text, advisories text, runTime text, officialUrl text, posterURL text, genres text, directors text, topCast text, releaseYear text, releaseDate text, 
-	               showingsStart text, showingsEnd text, theatresShowing text)''')
-
-
-	return connect, cursor
-
-def createPosterDatabase(jsonData):
-	connect = sqlite3.connect('movietimes.sqlite')
-	cursor = connect.cursor()
-
-	try:
-		cursor.execute('DROP TABLE moviePosterDB')
-	except:
-		pass
-
-	try:
-		cursor.execute('''CREATE TABLE moviePosterDB
-	               (title text, posterURL text)''')
-	except:
-		pass
-
-	x = 0
-	while x < len(jsonData):
-
-		fullMovieName = jsonData[x]['title']
-		movieName = (jsonData[x]['title']).replace(': The IMAX 2D Experience', '')
-		movieName = movieName.replace(' -- The IMAX 2D Experience', '')
-
-		print(fullMovieName + " looking for: " + movieName)
-		lookUpMovie = IMDbAPI.search_movie(movieName)
-		
-		try:
-			print("Found movie " + lookUpMovie[0].movieID)
-			currentMovie = IMDbAPI.get_movie(lookUpMovie[0].movieID)
-			posterURL = currentMovie.get('full-size cover url')
-		except:
-			posterURL = "Movie_not_found"
-			print("Movie not found")
-		print(posterURL)
-		# posterURL = "https://m.media-amazon.com/images/M/MV5BMzkwZWJhOTUtZTJkMC00OWQ5LTljZDctYzgxNWFiYjEyZjZiXkEyXkFqcGdeQXVyMDA4NzMyOA@@.jpg"
-
-		cursor.execute("INSERT INTO moviePosterDB VALUES (?, ?)", (fullMovieName, posterURL))
-		connect.commit()
-		x+=1
-
-	connect.commit()
-	connect.close()
-
-	print("Database created")
-
-def updatePosterDatabase(jsonData):
-	connect = sqlite3.connect('movietimes.sqlite')
-	cursor = connect.cursor()
-
-	x = 0
-	while x < len(jsonData):
-
-		fullMovieName = jsonData[x]['title']
-		cursor.execute("SELECT title FROM moviePosterDB WHERE title=?", (fullMovieName,))
-		found = cursor.fetchall()
-
-		if(found == []):
-			movieName = (fullMovieName).replace(': The IMAX 2D Experience', '')
-			movieName.replace(' -- The IMAX 2D Experience', '')
-			print(fullMovieName + " looking for: " + movieName)
-			lookUpMovie = IMDbAPI.search_movie(movieName)
-			
-			try:
-				currentMovie = IMDbAPI.get_movie(lookUpMovie[0].movieID)
-				posterURL = currentMovie.get('full-size cover url')
-			except:
-				posterURL = "Movie_not_found"
-				print("Movie not found")
-			if(posterURL == None):
-				posterURL = "Movie_not_found"
-			print(posterURL)
-
-			cursor.execute("INSERT INTO moviePosterDB VALUES (?, ?)", (fullMovieName, posterURL))
-			connect.commit()
-		x+=1
-	connect.commit()
-	connect.close()
-	print("Poster Database updated")
-
-def pullFromJson():
-	f = open('90days.json')
-	jsonData = json.load(f)
-
-	return jsonData
-
-def getGracenoteAPI(startDate, numDays, zipcode, lat, lng, radius, units):
-	startDate =  '&startDate=' + startDate #Start date (yyyy-mm-dd). Schedules available starting with current day.
+def callAPI(startDate, numDays, zipcode, lat, lng, radius, units):
+	startDate =  startDate #Start date (yyyy-mm-dd). Schedules available starting with current day.
 	if(numDays):
-		numDays = '&numDays=' + numDays
+		numDays = numDays
 	if(zipcode):
-		zipcode = '&zip=' + zipcode
+		zipcode = zipcode
 	lat = ''
 	lng = ''
 	if(radius):
-		radius = '&radius=' + radius
+		radius = radius
 	units = ''
 	imageSize = ''
 	imageText = ''
 	market = ''
-	try:
-		api = config.api_key
-	except:
-		api = os.environ["api_key"]
+	api = config.xapi
 
-	gracenote = 'http://data.tmsapi.com/v1.1/movies/showings?' + startDate + numDays + zipcode + radius + api
-	# print(gracenote)
-	response = requests.get(gracenote)
 
-	try:
-		jsonData = response.json()
-		return jsonData
-	except:
-		return None
+	response = requests.get(
+        url="https://api.internationalshowtimes.com/v4/movies/",
+        params={
+            "countries": "US",
+            "location": "47.63371178611272,-122.31584169070375",
+            "distance": "50",
+            # "cinema_id": "48091", #uptown
+            # "cinema_id": "48117", #film center
+            # "cinema_id": "48153", #egyptiion
+            # "cinema_id": "73899",
+            # "city_ids": "4966",
+            # "movie_id": "12664",
+            # "time_to": "2016-05-01T00:00:00-08:00"
+            # "fields": "cinema_movie_title",
+            "fields": "title,id,runtime",
+
+            
+        },
+        headers={
+            "X-API-Key": config.xapi,
+        },
+    )
+
+	return response.json()['movies']
 
 def dumpToDatabase(jsonData):
 	connect, cursor = createDatabase()

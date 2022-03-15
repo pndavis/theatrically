@@ -69,6 +69,7 @@
       <table
         id="table"
         data-toggle="table"
+        data-url={{moviesShowing}}
         data-search="true"
         data-toolbar="#toolbar"
         data-show-columns="true"
@@ -84,44 +85,11 @@
 
         <thead>
           <tr>
-            <th data-field="Poster" data-switchable="false" data-visible="false" data-card-visible="false">Poster</th>
-            <th data-field="Title" data-sortable="true" data-switchable="false" data-filter-control-visible ="false"data-formatter="linkFormatter" data-footer-formatter="titleLength" data-detail-formatter="fullMovies">Title</th>
-            <th data-field="Rating" data-detail-formatter="fullMovies">Rating</th>
-            <th data-field="Runtime" data-sortable="true" data-detail-formatter="fullMovies">Runtime</th>
-            <th data-field="Director" data-sortable="true" data-detail-formatter="fullMovies">Director</th>
-            <th data-field="ReleaseYear" data-sortable="true" data-detail-formatter="fullMovies">Release Year</th>
-            <th data-field="Description"data-detail-formatter="fullMovies">Description</th>
-            <th data-field="ShowingsStart" data-visible="false" data-detail-formatter="fullMovies">Local Showings Start</th>
-            <th data-field="ShowingsEnd" data-visible="false" data-detail-formatter="fullMovies">Local Showings End</th>
-            <th data-field="Showingat" data-formatter="shortingText" data-detail-formatter="fullMovies">Showing at</th>
-            <th data-field="MovieID" data-visible="false">Movie ID</th>
+             <th data-field="title" data-sortable="true" data-switchable="false" data-filter-control-visible ="false"data-footer-formatter="titleLength">Title</th>
+            <th data-field="runtime" data-sortable="true" >Runtime</th>
+           <th data-field="id">Movie ID</th>
           </tr>
         </thead>
-        <tbody> 
-          {% for row in moviesShowing %}
-            <tr>
-            {% if row[1] != "" and row[0] != "Movie_not_found"%}
-                <td><a href={{row[1]}}><img src={{row[0]}} width="50" height="100"></a></td> 
-            {% elif row[0] != "Movie_not_found"%}
-              <td><img src={{row[0]}} width="50" height="100"></td>
-            {% else %}
-              <td><img src="/static/img/indie.png" width="50" height="100"></td>
-            {% endif %}
-
-            <td>{{row[2]}}</td> 
-            <td>{{row[3]}}</td> 
-            <td>{{row[4]|format_Runtime}}</td> 
-            <td>{{row[5]}}</td> 
-            <td>{{row[6]}}</td> 
-            <td>{{row[7]}}</td> 
-            <td>{{row[8]|format_Month}}</td>
-            <td>{{row[9]|format_Month}}</td>
-            <td>{{row[10]}}</td>
-            <td>{{row[11]}}</td>
-
-            </tr>
-          {% endfor %}
-        </tbody>
       </table>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
