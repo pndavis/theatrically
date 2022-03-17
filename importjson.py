@@ -7,6 +7,8 @@ import os
 from imdb import IMDb
 
 IMDbAPI = IMDb()
+connect = sqlite3.connect(':memory:', check_same_thread=False)
+cursor = connect.cursor()
 
 def callAPI(startDate, numDays, zipcode, lat, lng, radius, units):
 	startDate =  startDate #Start date (yyyy-mm-dd). Schedules available starting with current day.
@@ -111,83 +113,136 @@ def dumpToDatabase(jsonData):
 		while theaterCount < len(jsonData[x]['showtimes']):
 			currenttheatre = jsonData[x]['showtimes'][theaterCount]['theatre']['name']
 
+def createDatabase():
+	try:
+		cursor.execute('DROP TABLE showtimes')
+	except:
+		pass
+	try:
+		cursor.execute('DROP TABLE movies')
+	except:
+		pass
+	try:
+		cursor.execute('DROP TABLE cinemas')
+	except:
+		pass
+
+	cursor.execute('''CREATE TABLE showtimes
+				(show_id text, cinema_id text, movie_id text, start_at text, language text, subtitle_language text, auditorium text, threeD text, imax text, booking_type text, booking_link text, cinema_movie_title text)''')
+	
+	cursor.execute('''CREATE TABLE movies
+	               (movie_id text, title text, poster_thumbnail text, imdb_id text)''')
+				   
+	cursor.execute('''CREATE TABLE cinemas
+					(cinema_id text, cinema_name text)''')
+
+
+
+def getAPI(startDate, numDays, zipcode, lat, lng, distance):
+
+	distance = 10
+	lat = '47.608013'
+	lon = '-122.335167'
+	location = lat + "," + lon
+	
+	try:
+		api = os.environ["xapi"]
+	except:
+		api = config.xapi
+
+	response = requests.get(
+		url="https://api.internationalshowtimes.com/v4/showtimes/",
+		params={
+			"countries": "US",
+			"location": location,
+			"distance": distance,
+			# "time_to": "2022-03-",
+			"fields": "id,cinema_id,movie_id,start_at,language,subtitle_language,auditorium,is_3d,is_imax,booking_type,booking_link,cinema_movie_title",
+			"append": "movies,cinemas",
+			"movie_fields": "id,title,poster_image_thumbnail,imdb_id",
+			"cinema_fields": "id,name",
 			
-			theatreID = jsonData[x]['showtimes'][theaterCount]['theatre']['id']
-			movieTime = jsonData[x]['showtimes'][theaterCount]['dateTime']
+			
+			
+			
+		},
+		headers={
+			"X-API-Key": api,
+		},
+	)
+	
+	return response
 
-			try:
-				generalSettings = jsonData[x]['showtimes'][theaterCount]['quals']
-			except:
-				generalSettings = ""
-			try:
-				bargin = jsonData[x]['showtimes'][theaterCount]['barg']
-			except:
-				bargin = ""
-			try:
-				ticketURL = jsonData[x]['showtimes'][theaterCount]['ticketURI']
-			except:
-				ticketURL = ""
+def dumpToDatabase(jsonData):
+	createDatabase()
 
-			#(tmsId text, title text, theatreName text, theatreID text, movieTime date, generalSettings text, officialUrl text, posterURL text, bargin text, ticketURL text)''')
-			cursor.execute("INSERT INTO movieTimeDB VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (tmsId, currenttitle, currenttheatre, theatreID, movieTime, generalSettings, officialUrl, posterURL, bargin, ticketURL))	
-
-			theaterCount+=1
-
-		cursor.execute("SELECT MIN(movieTime) AS First FROM movieTimeDB WHERE tmsId = ?", (tmsId,))
-		showingsStart = cursor.fetchall()
-		showingsStart = showingsStart[0][0]
-		cursor.execute("SELECT MAX(movieTime) AS Last FROM movieTimeDB WHERE tmsId = ?", (tmsId,))
-		showingsEnd = cursor.fetchall()
-		showingsEnd = showingsEnd[0][0]
-		cursor.execute("SELECT DISTINCT theatreName FROM movieTimeDB WHERE tmsId = ?", (tmsId,))
-		whichTheaters = cursor.fetchall()
-
-		i = len(whichTheaters)
-		j = 1
-		whichTheatersReturn = whichTheaters[0][0]
-		while j < i:
-			whichTheatersReturn = whichTheatersReturn + "; " + whichTheaters[j][0]
-			j+=1
-
-		#(tmsId text, title text, shortDescription text, rating text, advisories text, runTime text, officialUrl text, posterURL text, genres text, directors text, topCast text, releaseYear text, releaseDate date, 
-	    #           showingsStart text, showingsEnd text, theatresShowing text)''')
-
-		cursor.execute("INSERT INTO movieInfoDB VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (tmsId, currenttitle, shortDescription, rating, advisories, runTime, officialUrl, posterURL, genres, directors, topCast, releaseYear, releaseDate, showingsStart, showingsEnd, whichTheatersReturn))
-
-		x+=1
-
-	connect.commit()
-	connect.close()
+	
+	showtimeCount = 0
+	while showtimeCount < len(jsonData['showtimes']):
+		show_id = jsonData['showtimes'][showtimeCount]['id']
+		cinema_id = jsonData['showtimes'][showtimeCount]['cinema_id']
+		movie_id = jsonData['showtimes'][showtimeCount]['movie_id']
+		start_at = jsonData['showtimes'][showtimeCount]['start_at']
+		print(start_at)
+		language = jsonData['showtimes'][showtimeCount]['language']
+		subtitle_language = jsonData['showtimes'][showtimeCount]['subtitle_language']
+		auditorium = jsonData['showtimes'][showtimeCount]['auditorium']
+		is_3d = jsonData['showtimes'][showtimeCount]['is_3d']
+		is_imax = jsonData['showtimes'][showtimeCount]['is_imax']
+		booking_type = jsonData['showtimes'][showtimeCount]['booking_type']
+		booking_link = jsonData['showtimes'][showtimeCount]['booking_link']
+		cinema_movie_title = jsonData['showtimes'][showtimeCount]['cinema_movie_title']
+		
+		# print(cinema_id + " is " + jasonData['cinemas'][])
+		
+		cursor.execute("INSERT INTO showtimes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (show_id, cinema_id, movie_id, start_at, language, subtitle_language, auditorium, is_3d, is_imax, booking_type, booking_link, cinema_movie_title))
+		
+		# cursor.execute("SELECT * from showtimes")
+		# print(cursor.fetchall())
+		
+		showtimeCount+=1
+	
+	movieCount = 0
+	while movieCount < len(jsonData['movies']):
+		
+		movie_id = jsonData['movies'][movieCount]['id']
+		title = jsonData['movies'][movieCount]['title']
+		poster = jsonData['movies'][movieCount]['poster_image_thumbnail']
+		imdb_id = jsonData['movies'][movieCount]['imdb_id']
+		
+		cursor.execute("INSERT INTO movies VALUES (?, ?, ?, ?)", (movie_id, title, poster, imdb_id))
+		#{'id': '14262', 'title': 'I Am Here', 'poster_image_thumbnail': 'https://image.tmdb.org/t/p/w154/yA06Duc3TgvDvIJn72sOB0G19mH.jpg'
+		movieCount+=1
+		
+	cinemaCount = 0
+	while cinemaCount < len(jsonData['cinemas']):
+		cinema_id = jsonData['cinemas'][cinemaCount]['id']
+		cinema_name = jsonData['cinemas'][cinemaCount]['name']
+		
+		cursor.execute("INSERT INTO cinemas VALUES (?, ?)", (cinema_id, cinema_name))
+		cinemaCount+=1
+		
 
 def returnMoviesShowing():
-	connect = sqlite3.connect('movietimes.sqlite')
-	cursor = connect.cursor()
-	cursor.execute("SELECT posterURL, officialUrl, title, rating, runTime, directors, releaseYear, shortDescription, showingsStart, showingsEnd, theatresShowing, tmsId FROM movieInfoDB")
+	cursor.execute("SELECT show_id, cinema_id, showtimes.movie_id, start_at, language, subtitle_language, booking_link, cinema_movie_title, title, poster_thumbnail, imdb_id FROM showtimes INNER JOIN movies on showtimes.movie_id = movies.movie_id")
 	moviesPlayingNearYou = cursor.fetchall()
-	tosendback = sorted(moviesPlayingNearYou, key=lambda x: x[2].lower()) #Sort by title which is the 3rd element in query
-	connect.close()
-	return tosendback
+	return moviesPlayingNearYou
 
 def returnOneMoviesInfo(movieid):
-	connect = sqlite3.connect('movietimes.sqlite')
-	cursor = connect.cursor()
+	
 	cursor.execute("SELECT posterURL, officialUrl, title, rating, runTime, directors, releaseDate, shortDescription, showingsStart, showingsEnd, theatresShowing, tmsId FROM movieInfoDB WHERE tmsId = ?", (movieid,))
 	moviesPlayingNearYou = cursor.fetchall()
 	tosendback = sorted(moviesPlayingNearYou, key=lambda x: x[2].lower()) #Sort by title which is the 3rd element in query
-	connect.close()
 	return tosendback
 
 def returnOneMoviesTimes(movieid):
-	connect = sqlite3.connect('movietimes.sqlite')
-	cursor = connect.cursor()
+	
 	cursor.execute("SELECT theatreName, theatreID, movieTime, generalSettings, bargin, ticketURL FROM movieTimeDB WHERE tmsId = ?", (movieid,))
 	showtimes = cursor.fetchall()
-	connect.close()
 	return showtimes
 
 def searchDatabase(findmovie, theatreName, movieInfo, alist, dolby, imax):
-	connect = sqlite3.connect('movietimes.sqlite')
-	cursor = connect.cursor()
+	
 
 	if(alist):
 		alist = 'AMC'

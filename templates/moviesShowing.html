@@ -76,6 +76,10 @@
         data-show-columns-toggle-all="true"
         data-buttons-align="right"
         data-mobile-responsive="true"
+        data-pagination="true"
+        data-pagination-v-align="both"
+        data-page-size="100"
+        data-page-list="[50, 100, 200, All]"
         data-show-footer="true"
         data-show-multi-sort="true"
         >
@@ -87,6 +91,59 @@
            <th data-field="id">Movie ID</th>
           </tr>
         </thead>
+            <!-- <th data-field="Poster" data-switchable="false" data-visible="false" data-card-visible="false">Poster</th>
+            <th data-field="Title" data-sortable="true" data-switchable="false" data-filter-control-visible ="false"data-formatter="linkFormatter" data-footer-formatter="titleLength" data-detail-formatter="fullMovies">Title</th>
+            <th data-field="Rating" data-detail-formatter="fullMovies">Rating</th>
+            <th data-field="Runtime" data-sortable="true" data-detail-formatter="fullMovies">Runtime</th>
+            <th data-field="Director" data-sortable="true" data-detail-formatter="fullMovies">Director</th>
+            <th data-field="ReleaseYear" data-sortable="true" data-detail-formatter="fullMovies">Release Year</th>
+            <th data-field="Description"data-detail-formatter="fullMovies">Description</th> -->
+            <th data-field="show_id" data-visible="false">show_id</th>
+            <th data-field="cinema_id"data-visible="false">cinema_id</th>
+            <th data-field="movie_id">movie_id</th>
+            <th data-field="start_at" data-sortable="true" data-footer-formatter="titleLength">start_at</th>
+            <th data-field="language"data-visible="false" >language</th>
+            <th data-field="subtitle_language"data-visible="false" >subtitle_language</th>
+            <th data-field="booking_link">booking_link</th>
+            <th data-field="cinema_movie_title">cinema_movie_title</th>
+            <th data-field="movie_title">movie_title</th>
+            <th data-field="poster">poster</th>
+            <th data-field="imdb">imdbid</th>
+            
+          </tr>
+        </thead>
+        <tbody> 
+          {% for row in moviesShowing %}
+            <!-- <tr>
+            {% if row[1] != "" and row[0] != "Movie_not_found"%}
+                <td><a href={{row[1]}}><img src={{row[0]}} width="50" height="100"></a></td> 
+            {% elif row[0] != "Movie_not_found"%}
+              <td><img src={{row[0]}} width="50" height="100"></td>
+            {% else %}
+              <td><img src="/static/img/indie.png" width="50" height="100"></td>
+            {% endif %} -->
+            <td>{{row[0]}}</td> 
+            <td>{{row[1]}}</td> 
+            <td>{{row[2]}}</td> 
+            <td>{{row[3]}}</td> 
+            <td>{{row[4]}}</td> 
+            <td>{{row[5]|format_Showtime}}</td> 
+            {% if row[6] != None%}
+              <td><a href={{row[6]}} target="_blank">Tickets</a></td> 
+            {% else %}
+              <td></td>
+            {% endif %}
+            <td>{{row[7]}}</td>
+            <td>{{row[8]}}</td>
+            {% if row[9] != None%}
+              <td><a><img src={{row[9]}} width="50" height="100"></a></td> 
+            {% else %}
+              <td><img src="/static/img/indie.png" width="50" height="100"></td>
+            {% endif %}
+            <td><a href=https://www.imdb.com/title/{{row[10]}} target="_blank">{{row[10]}}</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
       </table>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>

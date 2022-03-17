@@ -15,9 +15,11 @@ def format_Month(value):
 @app.template_filter()
 def format_Showtime(value):
     # 2022-02-21T16:00
-    return datetime.strptime(value, '%Y-%m-%dT%H:%M').strftime('%m/%d at %-I:%M%p')
+    print(value)
+    if value == None:
+        return value
+    return datetime.strptime(value, '%Y-%m-%dT%H:%M:%S%z').strftime('%m/%d at %-I:%M%p')
 
-    PT01H52M
 @app.template_filter()
 def format_Runtime(value):
     # PT01H37M
@@ -37,8 +39,7 @@ def moviesShowing():
     zipcode = request.form['zipcode']
     # lat = request.form['lat']
     # lng = request.form['lng']
-    radius = request.form['radius']
-    # units = request.form['units']
+    distance = request.form['radius']
     lat = ''
     lng = ''
     units = ''
@@ -53,6 +54,18 @@ def moviesShowing():
         return render_template("404.html")
     else:
         return render_template("moviesShowing.html",moviesShowing=jsonData,moviesShowingString= json.dumps(jsonData))
+
+    response = getAPI(startDate, numDays, zipcode, lat, lng, distance)
+
+    
+    if(response.status_code == 404):
+        movieList = "Ran out of api calls"
+        return render_template("404.html")
+    else:
+        dumpToDatabase(response.json())
+        movieList = returnMoviesShowing()
+        return render_template("moviesShowing.html",moviesShowing=movieList)
+
 
 @app.route('/movielist')
 def movieList():
