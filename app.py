@@ -44,12 +44,15 @@ def moviesShowing():
     units = ''
 
     jsonData = callAPI(startDate, numDays, zipcode, lat, lng, radius, units)
+    print(jsonData)
+    with open('json_data.json', 'w') as outfile:
+        json.dump(jsonData, outfile)
     # jsonData = pullFromJson()
 
     if(jsonData == None):
         return render_template("404.html")
     else:
-        return render_template("moviesShowing.html",moviesShowing=jsonData)
+        return render_template("moviesShowing.html",moviesShowing=jsonData,moviesShowingString= json.dumps(jsonData))
 
 @app.route('/movielist')
 def movieList():

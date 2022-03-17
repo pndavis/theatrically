@@ -39,7 +39,7 @@ def callAPI(startDate, numDays, zipcode, lat, lng, radius, units):
             # "movie_id": "12664",
             # "time_to": "2016-05-01T00:00:00-08:00"
             # "fields": "cinema_movie_title",
-            "fields": "title,id,runtime",
+            "fields": "title,id,runtime,imdb_id",
 
             
         },
