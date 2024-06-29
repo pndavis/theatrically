@@ -1,4 +1,4 @@
-A web app to find movies playing in your area. Live at https://theatrically.herokuapp.com/
+A web app to find movies playing in your area. I would like to revisit this one day, but I abandoned the project because getting theater data is complicated and expensive. 
 
 Problem: There is no good place to see what movies are playing where and when. Movies that aren't blockbusters can go in and out of theaters without you knowing. Or your favorite film might make it's way back to theaters and you have no idea. 
 
